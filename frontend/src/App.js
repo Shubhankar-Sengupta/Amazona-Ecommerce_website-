@@ -1,5 +1,5 @@
-import HomeScreen from "./components/HomeScreen";
-import ProductScreen from "./components/ProductScreen";
+import HomeScreen from "./components/screens/HomeScreen";
+import ProductScreen from "./components/screens/ProductScreen";
 import {
   BrowserRouter as Router,
   Routes,
