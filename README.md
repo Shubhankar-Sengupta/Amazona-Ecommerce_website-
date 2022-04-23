@@ -1,7 +1,7 @@
-#Amazona Webiste.
+# Amazona Webiste.
 
 
-#Steps/Lessons
+# Steps/Lessons
 1. Installed tools on windows
 2. Configuring VS Code
 3. Create React app
