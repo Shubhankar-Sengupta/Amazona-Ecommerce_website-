@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
 
+
 function reducer(state, action) {
-  // second option that by default is passed to the reducer is action and the first is initial state
+  // second option that by default is passed to the reducer is action and the first is initial state.
   switch (action.type) {
     case 'Fetch_Request':
       return {
@@ -26,12 +27,13 @@ function reducer(state, action) {
     default:
       return state;
   }
+
 }
 
 
 function HomeScreen() {
-  const [ { loading, error, products }, dispatch ] = useReducer(logger(reducer), {
-    products: [],
+  const [{ loading, error, products }, dispatch] = useReducer(process.env.NODE_ENV === 'development' ? logger(reducer): reducer, {
+    products: {},
     loading: true,
     error: '',
   });
@@ -40,7 +42,6 @@ function HomeScreen() {
   useEffect(() => {
 
     try {
-
       const fetchData = async () => {
         dispatch({ type: 'Fetch_Request', loading: true });
         const result = await axios.get('/api/products');
@@ -60,21 +61,23 @@ function HomeScreen() {
       }
   }, []);
 
-  // we use JSX fragment
+  // we use JSX fragment.
 
   return (
     <>
       <h1 className="header-featured">Featured products</h1>
 
       <div className="products">
+
         {loading? <div>Loading....</div> : error?<div>{error}</div>: products.map((product) => (
+
           <div className="product" key={product.slug}>
-            {' '}
             {/** key props given so that react could identify the elements*/}
             <Link to={`/product/${product.slug}`}>
               <img src={product.image} alt={product.name} />
             </Link>
             <div className="product-info">
+
               <Link to={`/product/${product.slug}`}>
                 <p>{product.name}</p>
               </Link>
@@ -85,10 +88,14 @@ function HomeScreen() {
               <p>{product.description}</p>
 
               <button>{`Add to cart`.toUpperCase()}</button>
+
             </div>
+
           </div>
         ))}
+
       </div>
+
     </>
   );
 }
