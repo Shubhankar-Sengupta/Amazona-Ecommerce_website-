@@ -1,8 +1,9 @@
 import React, { useEffect, useReducer } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
-
+import Product from '../main_components/Product';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -27,20 +28,20 @@ function reducer(state, action) {
     default:
       return state;
   }
-
 }
 
-
 function HomeScreen() {
-  const [{ loading, error, products }, dispatch] = useReducer(process.env.NODE_ENV === 'development' ? logger(reducer): reducer, {
-    products: {},
-    loading: true,
-    error: '',
-  });
+  const [{ loading, error, products }, dispatch] = useReducer(
+    process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
+    {
+      products: {},
+      loading: true,
+      error: '',
+    }
+  );
 
   // repilcating componentDidMount();
   useEffect(() => {
-
     try {
       const fetchData = async () => {
         dispatch({ type: 'Fetch_Request', loading: true });
@@ -52,50 +53,32 @@ function HomeScreen() {
           error: '',
         });
       };
-        // here we call fetch data.
-        fetchData();
-    } 
-
-    catch (err) {
-      dispatch({type: 'Fetch_Fail', payload: err.message});
-      }
+      // here we call fetch data.
+      fetchData();
+    } catch (err) {
+      dispatch({ type: 'Fetch_Fail', payload: err.message });
+    }
   }, []);
 
   // we use JSX fragment.
 
   return (
     <>
-      <h1 className="header-featured">Featured products</h1>
-
-      <div className="products">
-
-        {loading? <div>Loading....</div> : error?<div>{error}</div>: products.map((product) => (
-
-          <div className="product" key={product.slug}>
-            {/** key props given so that react could identify the elements*/}
-            <Link to={`/product/${product.slug}`}>
-              <img src={product.image} alt={product.name} />
-            </Link>
-            <div className="product-info">
-
-              <Link to={`/product/${product.slug}`}>
-                <p>{product.name}</p>
-              </Link>
-
-              <p>
-                <strong>${product.price}</strong>
-              </p>
-              <p>{product.description}</p>
-
-              <button>{`Add to cart`.toUpperCase()}</button>
-
-            </div>
-
-          </div>
-        ))}
-
-      </div>
-
+      <h1>Featured products</h1>
+      {loading ? (
+        <div>Loading....</div>
+      ) : error ? (
+        <div>{error}</div>
+      ) : (
+        <Row>
+          {products.map((product) => (
+            <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
+              <Product product={product} />
+            </Col>
+          ))}
+        </Row>
+      )}
+      
     </>
   );
 }
