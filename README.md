@@ -1,7 +1,7 @@
 # Amazona Website.
 
 
-# Steps/Lessons
+# Lessons
 1. Installed tools on windows
 2. Configuring VS Code
 3. Create React app
@@ -45,11 +45,16 @@
 
 
 10. Add bootstrap UI Framework
-    1. npm install react-bootstrap bootstrap
-    2. update App.js
+   1. npm install react-bootstrap bootstrap
+   2. update App.js
 
 
 11. Create Product and Rating Component
-    1. create Rating component
-    2. Create Product component
-    3. Use Rating component in Product component
+   1. create Rating component
+   2. Create Product component
+   3. Use Rating component in Product component
+
+
+12. Create Product Details Screen
+   1. fetch product from backend
+   2. create 3 columns for image, info and action

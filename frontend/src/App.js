@@ -6,6 +6,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 
 function App() {
+
   return (
 
     <Router>
@@ -29,12 +30,16 @@ function App() {
         </header>
 
         <main>
-          <Container>
+
+          <Container className="mt-3">
+
             <Routes>
               <Route path="/" element={<HomeScreen />} />
               <Route path="/product/:slug" element={<ProductScreen />} />
             </Routes>
+
           </Container>
+
         </main>
 
         <footer>
