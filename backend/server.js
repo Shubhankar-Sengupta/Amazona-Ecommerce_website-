@@ -8,16 +8,13 @@ app.get('/api/products', (req, res) => {
 });
 
 app.get('/api/products/slug/:slug', (req, res) => {
-  const product= data.products.find((x) => x.slug === req.params.slug);
+  const product = data.products.find((x) => x.slug === req.params.slug);
 
   if (product) {
-    res.send( product );
+    res.send(product);
+  } else {
+    res.status(404).send({message: 'Oops!! Product Not Found'});
   }
-
-  else {
-    res.send({ message: "Product Not Found" });
-  }
-
 });
 
 //port bty default if there is any or else server would be listening at opened port 5000.

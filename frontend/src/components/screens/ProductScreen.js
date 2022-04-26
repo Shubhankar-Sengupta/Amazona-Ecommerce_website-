@@ -7,7 +7,10 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import Rating from '../main_components/Rating';
 import Badge from 'react-bootstrap/Badge';
 import Button from 'react-bootstrap/Button';
-import {Helmet} from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
+import Loader from '../main_components/Loader';
+import Message from '../main_components/Message';
+import { getError } from '../main_components/utils';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -46,38 +49,35 @@ function ProductScreen() {
 
   // repilcating componentDidMount(). Used for running side effects();
   useEffect(() => {
-    try {
-      const fetchData = async () => {
-        dispatch({ type: 'Fetch_Request', loading: true });
+    const fetchData = async () => {
+      dispatch({ type: 'Fetch_Request', loading: true });
+      try {
         const result = await axios.get(`/api/products/slug/${slug}`);
-
         dispatch({
           type: 'Fetch_Success',
           loading: false,
           payload: result.data,
-          error: '',
         });
-      };
+      } catch (err) {
+        // here we call fetch data.
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
+      }
+    };
 
-      // here we call fetch data.
-      fetchData();
-    } catch (err) {
-      dispatch({ type: 'Fetch_Fail', payload: err.message });
-    }
+    fetchData();
   }, [slug]); // whenever the slug changes useEffect() will be called and the component will re-render.
 
   // we use JSX fragment.
   return (
     <>
-
       <Helmet>
-          <title>{product.name}</title>
+        <title>{product.name}</title>
       </Helmet>
 
       {loading ? (
-        <div>Loading....</div>
+        <Loader />
       ) : error ? (
-        <div>{error}</div>
+        <Message variant="danger">{error}</Message>
       ) : (
         <div>
           <Row>
@@ -131,13 +131,13 @@ function ProductScreen() {
                   </Row>
                 </ListGroup.Item>
 
-                { product.countInStock>0 && 
+                {product.countInStock > 0 && (
                   <ListGroup.Item>
                     <div className="d-grid">
                       <Button variant="primary">Add to Cart</Button>
                     </div>
                   </ListGroup.Item>
-                }
+                )}
               </ListGroup>
             </Col>
           </Row>

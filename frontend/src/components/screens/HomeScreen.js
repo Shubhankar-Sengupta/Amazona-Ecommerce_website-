@@ -5,6 +5,8 @@ import Product from '../main_components/Product';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Helmet } from 'react-helmet-async';
+import Loader from '../main_components/Loader';
+import Message from '../main_components/Message';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -35,7 +37,7 @@ function HomeScreen() {
   const [{ loading, error, products }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
     {
-      products: {},
+      products: [],
       loading: true,
       error: '',
     }
@@ -43,9 +45,9 @@ function HomeScreen() {
 
   // repilcating componentDidMount();
   useEffect(() => {
-    try {
-      const fetchData = async () => {
-        dispatch({ type: 'Fetch_Request', loading: true });
+    const fetchData = async () => {
+      dispatch({ type: 'Fetch_Request', loading: true });
+      try {
         const result = await axios.get('/api/products');
         dispatch({
           type: 'Fetch_Success',
@@ -53,12 +55,12 @@ function HomeScreen() {
           payload: result.data,
           error: '',
         });
-      };
-      // here we call fetch data.
-      fetchData();
-    } catch (err) {
-      dispatch({ type: 'Fetch_Fail', payload: err.message });
-    }
+      } catch (err) {
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
+      }
+    };
+    // here we call fetch data.
+    fetchData();
   }, []);
 
   // we use JSX fragment.
@@ -71,9 +73,9 @@ function HomeScreen() {
 
       <h1>Featured products</h1>
       {loading ? (
-        <div>Loading....</div>
+        <Loader />
       ) : error ? (
-        <div>{error}</div>
+        <Message variant="danger">{error}</Message>
       ) : (
         <Row>
           {products.map((product) => (
