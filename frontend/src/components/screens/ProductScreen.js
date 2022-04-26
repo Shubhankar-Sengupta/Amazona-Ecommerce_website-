@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect } from 'react';
+import React, { useContext, useReducer, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Col from 'react-bootstrap/Col';
@@ -11,6 +11,7 @@ import { Helmet } from 'react-helmet-async';
 import Loader from '../main_components/Loader';
 import Message from '../main_components/Message';
 import { getError } from '../main_components/utils';
+import { Store } from '../../Store';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -46,6 +47,15 @@ function ProductScreen() {
     loading: true,
     error: '',
   });
+
+  const { state, dispatch: ctxDispatch } = useContext(Store);
+
+  const addCartHandler = () => {
+    ctxDispatch({
+      type: 'Cart_Add_item',
+      payload: { ...product, quantity: 1 },
+    });
+  };
 
   // repilcating componentDidMount(). Used for running side effects();
   useEffect(() => {
@@ -134,7 +144,7 @@ function ProductScreen() {
                 {product.countInStock > 0 && (
                   <ListGroup.Item>
                     <div className="d-grid">
-                      <Button variant="primary">Add to Cart</Button>
+                      <Button variant="primary" onClick={addCartHandler}>Add to Cart</Button>
                     </div>
                   </ListGroup.Item>
                 )}
