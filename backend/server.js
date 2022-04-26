@@ -17,6 +17,19 @@ app.get('/api/products/slug/:slug', (req, res) => {
   }
 });
 
+
+app.get('/api/products/:id', (req, res) => {
+
+  const product = data.products.find((x) => x._id === req.params.id);
+
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({message: 'Oops!! Product Not Found'});
+  }
+});
+
+
 //port bty default if there is any or else server would be listening at opened port 5000.
 const port = process.env.PORT || 5000;
 
