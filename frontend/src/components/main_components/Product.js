@@ -13,6 +13,7 @@ function Product(props) {
       </Link>
 
       <Card.Body>
+
         <Link to={`/product/${product.slug}`}>
           <Card.Title>{product.name}</Card.Title>
         </Link>
@@ -22,6 +23,7 @@ function Product(props) {
         <Card.Text><strong>${product.price}</strong></Card.Text>
 
         <Button>Add to cart</Button>
+
       </Card.Body>
     </Card>
   );
