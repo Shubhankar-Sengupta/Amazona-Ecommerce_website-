@@ -87,3 +87,9 @@
    1. click handler for inc/dec item
    2. click handler for remove item
    3. click handler for checkout
+
+18. Create Signin Screen
+   1. Add to Cart functionality on Product.js page (From 17)
+   2. create sign in form
+   3. add email and password
+   4. add signin button

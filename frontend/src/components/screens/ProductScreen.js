@@ -12,6 +12,7 @@ import Loader from '../main_components/Loader';
 import Message from '../main_components/Message';
 import { getError } from '../main_components/utils';
 import { Store } from '../../Store';
+import { useNavigate } from 'react-router-dom';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -41,6 +42,7 @@ function reducer(state, action) {
 function ProductScreen() {
   const params = useParams();
   const { slug } = params;
+  const navigate = useNavigate();
 
   const [{ loading, error, product }, dispatch] = useReducer(reducer, {
     product: [],
@@ -54,7 +56,6 @@ function ProductScreen() {
   const { cart } = state;
 
   const addCartHandler = async () => {
-
     const existItem = cart.cartItems.find((x) => x._id === product._id);
 
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -62,15 +63,16 @@ function ProductScreen() {
     const { data } = await axios.get(`/api/products/${product._id}`);
 
     if (data.countInStock < quantity) {
-      window.alert("Sorry. product is out of Stock");
+      window.alert('Sorry. product is out of Stock');
       return;
-
     }
 
     ctxDispatch({
       type: 'Cart_Add_item',
-      payload: { ...product, quantity},
+      payload: { ...product, quantity },
     });
+
+    navigate('/cart');
   };
 
   // repilcating componentDidMount(). Used for running side effects();
