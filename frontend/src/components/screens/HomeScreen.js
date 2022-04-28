@@ -30,10 +30,13 @@ function reducer(state, action) {
       };
     default:
       return state;
+
   }
 }
 
+
 function HomeScreen() {
+
   const [{ loading, error, products }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
     {
@@ -56,7 +59,7 @@ function HomeScreen() {
           error: '',
         });
       } catch (err) {
-        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
+        dispatch({type: 'Fetch_Fail', payload: getError(err)});
       }
     };
     // here we call fetch data.
