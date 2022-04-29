@@ -31,6 +31,7 @@ function Product(props) {
 
 
   return (
+
     <Card>
       <Link to={`/product/${product.slug}`}>
         <img src={product.image} className="card-img-top" alt={product.name} />
@@ -46,12 +47,13 @@ function Product(props) {
           <strong>${product.price}</strong>
         </Card.Text>
 
-        {product.countInStock === 0 ? (  
+        {product.countInStock === 0 ? ( 
+            
           <Button variant="light" disabled>
-            Out of Stock
+            Out of Stock 
           </Button>
         ) : (
-          <Button onClick={() => addToCartHandler(product)}>Add to cart</Button>
+          <Button onClick={() => addToCartHandler(product)}> Add to cart</Button>
         )}
       </Card.Body>
     </Card>

@@ -7,10 +7,11 @@ import { Link, useLocation } from 'react-router-dom';
 
 function SigninScreen() {
   const { search } = useLocation();
-  const redirectURL = new URLSearchParams(search).get('redirect');
+  const redirectURL = new URLSearchParams(search).get('redirect'); // '/shipping';
   const redirect = redirectURL ? redirectURL : '/';
 
   return (
+
     <Container className="small-container">
 
       <Helmet>
