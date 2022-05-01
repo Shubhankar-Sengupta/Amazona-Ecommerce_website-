@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom';
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
   switch (action.type) {
-
     case 'Fetch_Request':
       return {
         ...state,
@@ -38,15 +37,14 @@ function reducer(state, action) {
     default:
       return state;
   }
-
 }
 
 function ProductScreen() {
   const params = useParams();
-  const {slug} = params;
+  const { slug } = params;
   const navigate = useNavigate();
 
-  const [{loading, error, product}, dispatch] = useReducer(reducer, {
+  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
     product: [],
     loading: true,
     error: '',
@@ -55,7 +53,7 @@ function ProductScreen() {
   // here second dispatch renamed for clarity purposes.
   const { state, dispatch: ctxDispatch } = useContext(Store);
 
-  const {cart} = state;
+  const { cart } = state;
 
   const addCartHandler = async () => {
     const existItem = cart.cartItems.find((x) => x._id === product._id);
@@ -71,7 +69,7 @@ function ProductScreen() {
 
     ctxDispatch({
       type: 'Cart_Add_item',
-      payload: {...product, quantity},
+      payload: { ...product, quantity },
     });
 
     navigate('/cart');
@@ -79,9 +77,8 @@ function ProductScreen() {
 
   // repilcating componentDidMount(). Used for running side effects();
   useEffect(() => {
-
     const fetchData = async () => {
-      dispatch({type: 'Fetch_Request', loading: true});
+      dispatch({ type: 'Fetch_Request', loading: true });
 
       try {
         const result = await axios.get(`/api/products/slug/${slug}`);
@@ -92,7 +89,7 @@ function ProductScreen() {
         });
       } catch (err) {
         // here we call fetch data.
-        dispatch({type: 'Fetch_Fail', payload: getError(err)});
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
       }
     };
 
@@ -111,23 +108,17 @@ function ProductScreen() {
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
-
         <div>
-
           <Row>
-
             <Col md={6}>
-
               <img
                 className="img-large"
                 src={product.image}
                 alt={product.name}
               />
-
             </Col>
 
             <Col md={3}>
-
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h1>{product.name}</h1>
@@ -146,11 +137,9 @@ function ProductScreen() {
                   <p>{product.description}</p>
                 </ListGroup.Item>
               </ListGroup>
-
             </Col>
 
             <Col md={3}>
-
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
@@ -160,7 +149,6 @@ function ProductScreen() {
                 </ListGroup.Item>
 
                 <ListGroup.Item>
-
                   <Row>
                     <Col>Status: </Col>
                     <Col>
@@ -182,13 +170,9 @@ function ProductScreen() {
                     </div>
                   </ListGroup.Item>
                 )}
-
               </ListGroup>
-
             </Col>
-
           </Row>
-
         </div>
       )}
     </>

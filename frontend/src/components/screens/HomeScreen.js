@@ -7,6 +7,7 @@ import Col from 'react-bootstrap/Col';
 import { Helmet } from 'react-helmet-async';
 import Loader from '../main_components/Loader';
 import Message from '../main_components/Message';
+import { getError } from '../main_components/utils.js';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -30,13 +31,10 @@ function reducer(state, action) {
       };
     default:
       return state;
-
   }
 }
 
-
 function HomeScreen() {
-
   const [{ loading, error, products }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
     {
@@ -50,16 +48,18 @@ function HomeScreen() {
   useEffect(() => {
     const fetchData = async () => {
       dispatch({ type: 'Fetch_Request', loading: true });
+
       try {
-        const result = await axios.get('/api/products');
+        const {data} = await axios.get('/api/products');
+
         dispatch({
           type: 'Fetch_Success',
           loading: false,
-          payload: result.data,
+          payload: data,
           error: '',
         });
       } catch (err) {
-        dispatch({type: 'Fetch_Fail', payload: getError(err)});
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
       }
     };
     // here we call fetch data.
@@ -84,6 +84,7 @@ function HomeScreen() {
           {products.map((product) => (
             <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
               <Product product={product} />
+              {console.log(product)}
             </Col>
           ))}
         </Row>
