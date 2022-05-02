@@ -6,8 +6,14 @@ import logger from 'use-reducer-logger';
 export const Store = createContext();
 
 const initialState = {
+  userInfo: localStorage.getItem('userInfo')
+    ? JSON.parse(localStorage.getItem('userInfo'))
+    : null,
+
   cart: {
-    cartItems: localStorage.getItem('cart_items')? JSON.parse(localStorage.getItem('cart_items')):[]
+    cartItems: localStorage.getItem('cart_items')
+      ? JSON.parse(localStorage.getItem('cart_items'))
+      : [],
   },
 };
 
@@ -28,7 +34,6 @@ function reducer(state, action) {
           )
         : [...state.cart.cartItems, newItem];
 
-
       localStorage.setItem('cart_items', JSON.stringify(cartItems));
 
       return {
@@ -40,8 +45,9 @@ function reducer(state, action) {
       };
 
     case 'Cart_Remove_item': {
-
-      const cartItems = state.cart.cartItems.filter((item)=> action.payload._id !== item._id);
+      const cartItems = state.cart.cartItems.filter(
+        (item) => action.payload._id !== item._id
+      );
       localStorage.setItem('cart_items', JSON.stringify(cartItems));
 
       return {
@@ -50,6 +56,17 @@ function reducer(state, action) {
           ...state.cart,
           cartItems,
         },
+      };
+    }
+
+    case 'User_SignedIn': {
+      return { ...state, userInfo: action.payload };
+    }
+
+    case 'User_SignedOut': {
+      return {
+        ...state,
+        userInfo: null,
       };
     }
 
