@@ -39,7 +39,6 @@ function SigninScreen() {
       navigate(redirect || '/');
       toast.success('Successfully signed in', {
         theme: 'dark',
-        position: 'top-center',
       });
     } catch (err) {
       toast.error(getError(err), { theme: 'dark' });
@@ -49,7 +48,7 @@ function SigninScreen() {
   // would run when an update occurs.
   useEffect(() => {
     if (userInfo) {
-      navigate(redirect || '/');
+      navigate(redirect);
     }
   }, [navigate, redirect, userInfo]);
 

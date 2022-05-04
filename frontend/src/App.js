@@ -13,6 +13,7 @@ import Badge from 'react-bootstrap/Badge';
 import CartScreen from './components/screens/CartScreen';
 import SigninScreen from './components/screens/SigninScreen';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import ShippingScreen from './components/screens/ShippingScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -23,8 +24,9 @@ function App() {
     ctxDispatch({ type: 'User_SignedOut' });
     toast.success('Successfully signed out', {
       theme: 'colored',
-      position: 'top-center',
     });
+
+    localStorage.removeItem('shippingAddress');
     localStorage.removeItem('userInfo');
   };
 
@@ -38,7 +40,7 @@ function App() {
                 <Navbar.Brand>amazona</Navbar.Brand>
               </LinkContainer>
 
-              <ToastContainer position="bottom-center" />
+              <ToastContainer position="top-center" limit={1} />
 
               <Nav className="me-auto">
                 <Link
@@ -96,6 +98,7 @@ function App() {
               <Route path="/product/:slug" element={<ProductScreen />} />
               <Route path="/cart" element={<CartScreen />} />
               <Route path="/signin" element={<SigninScreen />} />
+              <Route path="/shipping" element={<ShippingScreen />} />
             </Routes>
           </Container>
         </main>

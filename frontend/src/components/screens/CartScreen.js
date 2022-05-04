@@ -12,7 +12,11 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function CartScreen() {
-  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const {
+    state,
+    dispatch: ctxDispatch,
+    state: { userInfo },
+  } = useContext(Store);
 
   // to navigate to other page
   const navigate = useNavigate();
@@ -22,7 +26,6 @@ function CartScreen() {
   } = state;
 
   const addToCartHandler = async (item, quantity) => {
-
     const { data } = await axios(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
       window.alert('Sorry. product is out of Stock');
@@ -31,18 +34,16 @@ function CartScreen() {
 
     ctxDispatch({
       type: 'Cart_Add_item',
-      payload: {...item, quantity },
+      payload: { ...item, quantity },
     });
   };
 
   const removeCartHandler = (item) => {
-      ctxDispatch({
+    ctxDispatch({
       type: 'Cart_Remove_item',
       payload: item,
     });
   };
-
-
 
   const checkoutHandler = () => {
     navigate('/signin?redirect=/shipping');
@@ -60,7 +61,10 @@ function CartScreen() {
         <Col md={8}>
           {cartItems.length === 0 ? (
             <Message>
-              Cart is Empty <Link to="/">Go to shopping</Link>
+              Cart is Empty{' '}
+              <Link to="/">
+                {userInfo ? 'Go to Shopping' : 'Login to Shop'}
+              </Link>
             </Message>
           ) : (
             <ListGroup>

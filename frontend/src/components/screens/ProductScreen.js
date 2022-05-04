@@ -51,7 +51,11 @@ function ProductScreen() {
   });
 
   // here second dispatch renamed for clarity purposes.
-  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const {
+    state,
+    dispatch: ctxDispatch,
+    state: { userInfo },
+  } = useContext(Store);
 
   const { cart } = state;
 
@@ -164,9 +168,11 @@ function ProductScreen() {
                 {product.countInStock > 0 && (
                   <ListGroup.Item>
                     <div className="d-grid">
-                      <Button variant="primary" onClick={addCartHandler}>
-                        Add to Cart
-                      </Button>
+                      {userInfo && (
+                        <Button variant="primary" onClick={addCartHandler}>
+                          Add to Cart
+                        </Button>
+                      )}
                     </div>
                   </ListGroup.Item>
                 )}

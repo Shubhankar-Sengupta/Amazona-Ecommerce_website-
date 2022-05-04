@@ -50,7 +50,7 @@ function HomeScreen() {
       dispatch({ type: 'Fetch_Request', loading: true });
 
       try {
-        const {data} = await axios.get('/api/products');
+        const { data } = await axios.get('/api/products');
 
         dispatch({
           type: 'Fetch_Success',
