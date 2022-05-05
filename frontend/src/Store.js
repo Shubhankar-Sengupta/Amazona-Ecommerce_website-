@@ -14,12 +14,16 @@ const initialState = {
     cartItems: localStorage.getItem('cart_items')
       ? JSON.parse(localStorage.getItem('cart_items'))
       : [],
+    paymentMethod: localStorage.getItem('paymentMethod')
+      ? localStorage.getItem('paymentMethod')
+      : 'PayPal',
     shippingAddress: localStorage.getItem('shippingAddress')
       ? JSON.parse(localStorage.getItem('shippingAddress'))
       : {},
   },
 };
 
+// reducer function first takes a state argument and second is the action object which updates the state(UI) using useReducer.
 function reducer(state, action) {
   switch (action.type) {
     case 'Cart_Add_item':
@@ -75,6 +79,7 @@ function reducer(state, action) {
         cart: {
           shippingAddress: {},
           cartItems: [],
+          paymentMethod: '',
         },
       };
     }
@@ -86,13 +91,22 @@ function reducer(state, action) {
       };
     }
 
+    case 'Save_Payment_method': {
+      return {
+        ...state,
+        cart: { ...state.cart, paymentMethod: action.payload },
+      };
+    }
+
     default:
       return state;
   }
 }
+// every state& action defined  in the reducer function above updates the state& UI.
 
 export function StoreProvider(props) {
-  const [state, dispatch] = useReducer(logger(reducer), initialState);
+  const [state, dispatch] = useReducer(logger(reducer), initialState); // this takes a reducer function and a initial state
+  //and returns a state and dispatch function and is seperate from the Store. which uses context api to give access to this state and dispatch function.
 
   // this is to be passed to the <Store.Provider/>
   const value = { state, dispatch };

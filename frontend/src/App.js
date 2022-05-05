@@ -15,6 +15,7 @@ import SigninScreen from './components/screens/SigninScreen';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import ShippingScreen from './components/screens/ShippingScreen.js';
 import SignupScreen from './components/screens/SignupScreen.js';
+import PaymentScreen from './components/screens/PaymentScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -29,6 +30,7 @@ function App() {
 
     localStorage.removeItem('shippingAddress');
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('paymentMethod');
   };
 
   return (
@@ -101,6 +103,7 @@ function App() {
               <Route path="/signin" element={<SigninScreen />} />
               <Route path="/signup" element={<SignupScreen />} />
               <Route path="/shipping" element={<ShippingScreen />} />
+              <Route path="/payment" element={<PaymentScreen />} />
             </Routes>
           </Container>
         </main>
