@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button';
 import CheckoutSteps from '../main_components/CheckoutSteps.js';
 import { Store } from '../../Store.js';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 function PaymentScreen() {
   const navigate = useNavigate();
@@ -26,6 +25,8 @@ function PaymentScreen() {
     navigate('/placeorder');
   };
 
+
+  // once the component has mounted then it will run.
   useEffect(() => {
     if (!shippingAddress.address) {
       navigate('/shipping');
