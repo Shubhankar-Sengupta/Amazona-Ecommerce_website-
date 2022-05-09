@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
@@ -8,17 +8,41 @@ import CheckoutSteps from '../main_components/CheckoutSteps';
 import { Store } from '../../Store';
 import { Link, useNavigate } from 'react-router-dom';
 import ListGroup from 'react-bootstrap/ListGroup';
+import axios from 'axios';
+import { getError } from '../main_components/utils.js';
+import Loader from '../main_components/Loader.js';
+import { toast } from 'react-toastify';
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'Create_Request': {
+      return { ...state, loading: true };
+    }
+
+    case 'Create_Success': {
+      return { ...state, loading: false };
+    }
+
+    case 'Create_Fail': {
+      return { ...state, loading: false };
+    }
+
+    default: {
+      return state;
+    }
+  }
+};
 
 function PlaceOrderScreen() {
   const {
     state,
-    userInfo,
-    state: { cart },
+    state: { cart, userInfo },
+    dispatch: ctxDispatch,
   } = useContext(Store);
 
-  const navigate = useNavigate();
+  const [{ loading }, dispatch] = useReducer(reducer, { loading: false });
 
-  const placeOrderHandler = () => {};
+  const navigate = useNavigate();
 
   const {
     cart: { shippingAddress, paymentMethod, cartItems },
@@ -42,6 +66,43 @@ function PlaceOrderScreen() {
     }
   }, [navigate, cart]);
 
+  const placeOrderHandler = async () => {
+    try {
+      dispatch({ type: 'Create_Request' });
+      const { data } = await axios.post(
+        '/api/orders',
+        {
+          orderItems: cartItems,
+          shippingAddress,
+          paymentMethod,
+          itemsPrice: cart.itemsPrice,
+          shippingPrice: cart.shippingPrice,
+          taxPrice: cart.taxPrice,
+          totalPrice: cart.totalPrice,
+        },
+        {
+          headers: {
+            authorization: 'Bearer ' + userInfo.token,
+          },
+        }
+      );
+
+      // once data is fetched dispatch two actions to the reducer one in the component itself and another in
+      // Context Store that we have setup.
+
+      dispatch({ type: 'Create_Success' });
+      ctxDispatch({ type: 'Cart_Clear' });
+
+      // to clear the cart for new order.
+      localStorage.removeItem('cart_items');
+
+      // navigate to the order screen or order details page.
+      navigate(`/order/${data.order._id}`);
+    } catch (err) {
+      toast.error(getError(err));
+      dispatch({ type: 'Create_Fail' });
+    }
+  };
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
@@ -49,11 +110,11 @@ function PlaceOrderScreen() {
         <title>Place Order</title>
       </Helmet>
 
-      <h1 className="mt-3">Preview Order</h1>
+      <h1 className="mb-3">Preview Order</h1>
 
       <Row>
         <Col md={8}>
-          <Card>
+          <Card className="mb-3">
             <Card.Body>
               <Card.Title>Shipping</Card.Title>
               <Card.Text>
@@ -68,7 +129,7 @@ function PlaceOrderScreen() {
             </Card.Body>
           </Card>
 
-          <Card className="mt-3">
+          <Card className="mb-3">
             <Card.Body>
               <Card.Title>Payment</Card.Title>
 
@@ -81,7 +142,7 @@ function PlaceOrderScreen() {
             </Card.Body>
           </Card>
 
-          <Card className="mt-3">
+          <Card className="mb-3">
             <Card.Body>
               <Card.Title>Items</Card.Title>
               <ListGroup variant="flush">
@@ -158,6 +219,8 @@ function PlaceOrderScreen() {
                       Place Order
                     </Button>
                   </div>
+
+                  {loading && <Loader />}
                 </ListGroup.Item>
               </ListGroup>
             </Card.Body>

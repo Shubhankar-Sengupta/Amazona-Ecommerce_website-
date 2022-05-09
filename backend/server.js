@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import seedRouter from './routes/seedRoutes.js';
 import productsRoutes from './routes/productRoutes.js';
 import userRouter from './routes/usersRoutes.js';
+import orderRouter from './routes/orderRoutes.js'
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();
@@ -27,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/seed', seedRouter);
 
 app.use('/api/products', productsRoutes);
+
+app.use('/api/orders', orderRouter);
 
 app.use('/api/users', userRouter);
 
