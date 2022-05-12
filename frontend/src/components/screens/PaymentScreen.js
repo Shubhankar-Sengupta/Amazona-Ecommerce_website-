@@ -5,6 +5,7 @@ import Button from 'react-bootstrap/Button';
 import CheckoutSteps from '../main_components/CheckoutSteps.js';
 import { Store } from '../../Store.js';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function PaymentScreen() {
   const navigate = useNavigate();
@@ -24,7 +25,6 @@ function PaymentScreen() {
     localStorage.setItem('paymentMethod', paymentMethodName);
     navigate('/placeorder');
   };
-
 
   // once the component has mounted then it will run.
   useEffect(() => {
@@ -49,6 +49,7 @@ function PaymentScreen() {
             type="radio"
             id="PayPal"
             value="PayPal"
+            disabled={true}
             checked={paymentMethodName === 'PayPal'}
             onChange={(e) => {
               setPaymentMethod(e.target.value);

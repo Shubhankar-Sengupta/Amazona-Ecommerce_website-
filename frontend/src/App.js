@@ -18,6 +18,8 @@ import SignupScreen from './components/screens/SignupScreen.js';
 import PaymentScreen from './components/screens/PaymentScreen.js';
 import PlaceOrderScreen from './components/screens/PlaceOrderScreen.js';
 import OrderScreen from './components/screens/OrderScreen.js';
+import OrderHistoryScreen from './components/screens/OrderHistoryScreen.js';
+import UserProfileScreen from './components/screens/UserProfileScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -30,6 +32,7 @@ function App() {
       theme: 'colored',
     });
 
+    window.location.href = '/signin';
     localStorage.removeItem('shippingAddress');
     localStorage.removeItem('userInfo');
     localStorage.removeItem('paymentMethod');
@@ -39,7 +42,7 @@ function App() {
     <Router>
       <div className="d-flex flex-column site-container">
         <header>
-          <Navbar bg="dark" variant="dark">
+          <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
               <LinkContainer to="/">
                 <Navbar.Brand>amazona</Navbar.Brand>
@@ -47,51 +50,55 @@ function App() {
 
               <ToastContainer position="top-center" limit={1} />
 
-              <Nav className="me-auto">
-                <Link
-                  to="/cart"
-                  className="nav-link"
-                  style={{ display: 'flex', alignItems: 'center' }}
-                >
-                  Cart
-                  {cart.cartItems.length > 0 && (
-                    <Badge pill bg="danger">
-                      {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
-                    </Badge>
-                  )}
-                </Link>
+              <Navbar.Toggle aria-controls="basic-control-nav" />
 
-                {userInfo ? (
-                  <NavDropdown
-                    title={userInfo.name}
-                    id="basic-nav-dropdown"
+              <Navbar.Collapse id="basic-control-nav">
+                <Nav className="me-auto w-100 justify-content-end">
+                  <Link
+                    to="/cart"
                     className="nav-link"
-                    to="/signin"
+                    style={{ display: 'flex', alignItems: 'center' }}
                   >
-                    <LinkContainer to="/profile">
-                      <NavDropdown.Item>User Profile</NavDropdown.Item>
-                    </LinkContainer>
-
-                    <LinkContainer to="/orderhistory">
-                      <NavDropdown.Item>Order History</NavDropdown.Item>
-                    </LinkContainer>
-
-                    <NavDropdown.Divider />
-
-                    <Link
-                      className="dropdown-item"
-                      onClick={signoutHandler}
-                      to="#signout"
-                    >
-                      Sign Out
-                    </Link>
-                  </NavDropdown>
-                ) : (
-                  <Link className="nav-link" to="/signin">
-                    Sign In
+                    Cart
+                    {cart.cartItems.length > 0 && (
+                      <Badge pill bg="danger">
+                        {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                      </Badge>
+                    )}
                   </Link>
-                )}
-              </Nav>
+
+                  {userInfo ? (
+                    <NavDropdown
+                      title={userInfo.name}
+                      id="basic-nav-dropdown"
+                      className="nav-link"
+                      to="/signin"
+                    >
+                      <LinkContainer to="/profile">
+                        <NavDropdown.Item>User Profile</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/orderhistory">
+                        <NavDropdown.Item>Order History</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <NavDropdown.Divider />
+
+                      <Link
+                        className="dropdown-item"
+                        onClick={signoutHandler}
+                        to="#signout"
+                      >
+                        Sign Out
+                      </Link>
+                    </NavDropdown>
+                  ) : (
+                    <Link className="nav-link" to="/signin">
+                      Sign In
+                    </Link>
+                  )}
+                </Nav>
+              </Navbar.Collapse>
             </Container>
           </Navbar>
         </header>
@@ -108,6 +115,8 @@ function App() {
               <Route path="/payment" element={<PaymentScreen />} />
               <Route path="/placeorder" element={<PlaceOrderScreen />} />
               <Route path="/order/:id" element={<OrderScreen />} />
+              <Route path="/orderhistory" element={<OrderHistoryScreen />} />
+              <Route path="/profile" element={<UserProfileScreen />} />
             </Routes>
           </Container>
         </main>

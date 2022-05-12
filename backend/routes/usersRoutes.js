@@ -3,6 +3,8 @@ import User from '../models/User.js';
 import bcyrpt from 'bcryptjs';
 import { generateToken } from '../utils.js';
 import expressAsyncHandler from 'express-async-handler';
+import { isAuth } from '../utils.js';
+import bcrypt from 'bcryptjs';
 
 const userRouter = express.Router();
 
@@ -35,7 +37,6 @@ userRouter.post(
 userRouter.post(
   '/signup',
   expressAsyncHandler(async (req, res, next) => {
-
     const { name, email, password } = req.body;
 
     const user = new User({
@@ -54,6 +55,39 @@ userRouter.post(
       isAdmin: user.isAdmin,
       token: generateToken(user),
     });
+  })
+);
+
+userRouter.put(
+  '/profile',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const { name, email, password } = req.body;
+    const { id } = req.user;
+    const user = await User.findOne({ id });
+
+    if (user) {
+      user.name = name || user.name;
+      user.email = email || user.email;
+
+
+      // code stops here to execute.
+      if (password) {
+        user.password = bcrypt.hashSync(password, 8);
+      }
+
+      const updatedUser = await user.save();
+
+      res.send({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        token: generateToken(updatedUser),
+      });
+    } else {
+      res.status(404).send({ message: 'Failed to update try again.' });
+    }
   })
 );
 

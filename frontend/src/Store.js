@@ -1,5 +1,6 @@
 // create a  context store to ue for global state.
 import { useReducer, createContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import logger from 'use-reducer-logger';
 
 // this gives us a Context Object.
@@ -16,7 +17,7 @@ const initialState = {
       : [],
     paymentMethod: localStorage.getItem('paymentMethod')
       ? localStorage.getItem('paymentMethod')
-      : 'PayPal',
+      : 'Stripe',
     shippingAddress: localStorage.getItem('shippingAddress')
       ? JSON.parse(localStorage.getItem('shippingAddress'))
       : {},
@@ -117,6 +118,7 @@ export function StoreProvider(props) {
 
   // this is to be passed to the <Store.Provider/>
   const value = { state, dispatch };
+
 
   // this would provide access of the Context store to the entire component tree encapsulated within from it's nearest Provider.
   return <Store.Provider value={value}>{props.children}</Store.Provider>;
