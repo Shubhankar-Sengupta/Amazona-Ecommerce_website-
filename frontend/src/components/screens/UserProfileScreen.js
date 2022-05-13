@@ -31,8 +31,10 @@ function UserProfileScreen() {
   const { state, dispatch: cxtDispatch } = useContext(Store);
   const { userInfo } = state;
 
-  const [name, setName] = useState(userInfo.name);
-  const [email, setEmail] = useState(userInfo.email);
+  const navigate = useNavigate();
+
+  const [name, setName] = useState(userInfo ? userInfo.name : '');
+  const [email, setEmail] = useState(userInfo ? userInfo.email : '');
   const [password, setPassword] = useState('');
   const [cPassword, setCPassword] = useState('');
   const [button, setButton] = useState('Update');
@@ -77,6 +79,12 @@ function UserProfileScreen() {
       toast.error(getError(err));
     }
   };
+
+  useEffect(() => {
+    if (!userInfo) {
+      navigate('/signin?redirect=/profile');
+    }
+  }, [userInfo, navigate]);
 
   return (
     <div>
