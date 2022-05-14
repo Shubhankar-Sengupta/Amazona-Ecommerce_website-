@@ -32,7 +32,6 @@ function App() {
       theme: 'colored',
     });
 
-    window.location.href = '/signin';
     localStorage.removeItem('shippingAddress');
     localStorage.removeItem('userInfo');
     localStorage.removeItem('paymentMethod');

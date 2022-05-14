@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet-async';
 import { Store } from '../../Store.js';
 import { useNavigate } from 'react-router-dom';
 import CheckoutSteps from '../main_components/CheckoutSteps.js';
+import { toast } from 'react-toastify';
 
 function ShippingScreen() {
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ function ShippingScreen() {
     );
 
     navigate('/payment');
+    toast.info('PayPal disabled for the moment.');
   };
 
   return (
