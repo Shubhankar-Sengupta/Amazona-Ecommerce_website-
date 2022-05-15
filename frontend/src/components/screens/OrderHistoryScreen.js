@@ -48,8 +48,12 @@ function OrderHistoryScreen() {
       }
     };
 
+    if (!userInfo) {
+      navigate('/signin?redirect=/orderhistory');
+    }
+
     fetchData();
-  }, [userInfo]);
+  }, [userInfo, navigate]);
 
   return loading ? (
     <Loader />
