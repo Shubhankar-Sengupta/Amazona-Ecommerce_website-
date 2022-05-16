@@ -6,6 +6,8 @@ import productsRoutes from './routes/productRoutes.js';
 import userRouter from './routes/usersRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
 import path from 'path';
+import stripeRouter from './routes/stripeRoutes.js';
+// import cors from 'cors';
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();
@@ -22,6 +24,8 @@ mongoose
 
 const app = express();
 
+// app.use(cors());
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +37,8 @@ app.use('/api/products', productsRoutes);
 app.use('/api/orders', orderRouter);
 
 app.use('/api/users', userRouter);
+
+app.use('/api/stripe', stripeRouter);
 
 const __dirname = path.resolve();
 
@@ -49,7 +55,7 @@ app.use((err, req, res, next) => {
 //port bty default if there is any or else server would be listening at opened port 5000.
 const port = process.env.PORT || 5000;
 
-// actual listenning happens here.
+// actual listening happens here.
 app.listen(port, () => {
   console.log(`Server is listening at the port http://localhost:${port}`);
 });

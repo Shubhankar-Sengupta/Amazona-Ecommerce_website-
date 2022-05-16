@@ -20,6 +20,7 @@ import PlaceOrderScreen from './components/screens/PlaceOrderScreen.js';
 import OrderScreen from './components/screens/OrderScreen.js';
 import OrderHistoryScreen from './components/screens/OrderHistoryScreen.js';
 import UserProfileScreen from './components/screens/UserProfileScreen.js';
+import CheckoutSuccess from './components/main_components/CheckoutSuccess.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -116,6 +117,8 @@ function App() {
               <Route path="/order/:id" element={<OrderScreen />} />
               <Route path="/orderhistory" element={<OrderHistoryScreen />} />
               <Route path="/profile" element={<UserProfileScreen />} />
+              <Route path="/checkoutsuccess" element={<CheckoutSuccess />} />
+              
             </Routes>
           </Container>
         </main>
