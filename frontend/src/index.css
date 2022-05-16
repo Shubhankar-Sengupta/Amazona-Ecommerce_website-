@@ -7,26 +7,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 .site-container {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 
 .img-large {
-  max-width:100%
+  max-width: 100%;
 }
 
 main {
   flex: 1;
 }
 
-.btn-primary {
-  background-color:#f0c040;
+.btn-primary, .btn-outline-primary {
+  background-color: #f0c040;
   color: #000;
 }
 
 .rating span {
-  color:#f0c040;
+  color: #f0c040;
 }
 
 .products {
@@ -50,7 +49,6 @@ main {
   margin: 1rem;
 }
 
-
 .img-thumbnail {
   height: 80px;
 }
@@ -66,4 +64,27 @@ main {
 .checkout-steps > div.active {
   border-bottom: 0.2rem solid #f08000;
   color: #f08000;
+}
+
+.side-navbar {
+  position: absolute;
+  width: 240px;
+  left: -300px;
+  transition: 0.5s;
+  height: 100%;
+  background-color: #100901;
+}
+
+
+.site-container {
+  transition: .4s;
+
+}
+
+.active-cont {
+  margin-left: 240px;
+}
+
+.active-nav {
+  left: 0;
 }

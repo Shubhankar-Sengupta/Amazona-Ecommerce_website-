@@ -1,19 +1,24 @@
 import express from 'express';
 import Product from '../models/Product.js';
+import expressAsyncHandler from 'express-async-handler';
 const productsRoutes = express.Router();
 
 productsRoutes.get('/', async (req, res) => {
-
   const products = await Product.find({});
   if (products) {
     res.send(products);
+  } else {
+    res.status(404).send({ message: 'No Products to display' });
   }
-
-  else {
-    res.status(404).send({message: 'No Products to display'});
-  }
-  
 });
+
+productsRoutes.get(
+  '/categories',
+  expressAsyncHandler(async (req, res) => {
+    const categories = await Product.find().distinct('category');
+    res.send(categories);
+  })
+);
 
 productsRoutes.get('/slug/:slug', async (req, res) => {
   const product = await Product.findOne({ slug: req.params.slug });

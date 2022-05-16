@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Store } from './Store.js';
 import HomeScreen from './components/screens/HomeScreen';
 import ProductScreen from './components/screens/ProductScreen';
@@ -21,10 +21,18 @@ import OrderScreen from './components/screens/OrderScreen.js';
 import OrderHistoryScreen from './components/screens/OrderHistoryScreen.js';
 import UserProfileScreen from './components/screens/UserProfileScreen.js';
 import CheckoutSuccess from './components/main_components/CheckoutSuccess.js';
+import Button from 'react-bootstrap/Button';
+import axios from 'axios';
+import { getError } from './components/main_components/utils.js';
+import SearchBox from './components/main_components/SearchBox.js';
+import NotFound from './components/main_components/NotFound.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
   const { cart, userInfo } = state;
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
 
   // signout from the application.
   const signoutHandler = () => {
@@ -38,12 +46,38 @@ function App() {
     localStorage.removeItem('paymentMethod');
   };
 
+  // componentdidmount replicate
+  useEffect(() => {
+    try {
+      const fetchCategory = async () => {
+        const { data } = await axios.get('/api/products/categories');
+        setCategories(data);
+      };
+
+      fetchCategory();
+    } catch (err) {
+      toast.error(getError(err));
+    }
+  }, []);
+
   return (
     <Router>
-      <div className="d-flex flex-column site-container">
+      <div
+        className={
+          sidebarOpen
+            ? 'd-flex flex-column site-container active-cont'
+            : 'd-flex flex-column site-container'
+        }
+      >
         <header>
           <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
+              <Button
+                variant="dark"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+              >
+                <i className="fas fa-bars"></i>
+              </Button>
               <LinkContainer to="/">
                 <Navbar.Brand>amazona</Navbar.Brand>
               </LinkContainer>
@@ -53,6 +87,7 @@ function App() {
               <Navbar.Toggle aria-controls="basic-control-nav" />
 
               <Navbar.Collapse id="basic-control-nav">
+                <SearchBox />
                 <Nav className="me-auto w-100 justify-content-end">
                   <Link
                     to="/cart"
@@ -103,6 +138,31 @@ function App() {
           </Navbar>
         </header>
 
+        <div
+          className={
+            sidebarOpen
+              ? 'active-nav side-navbar d-flex justify-content-between flex-wrap flex-column'
+              : 'side-navbar d-flex justify-content-between flex-wrap flex-column'
+          }
+        >
+          <Nav className="flex-column text-white w-100 p-2">
+            <Nav.Item>
+              <strong>Categories</strong>
+            </Nav.Item>
+
+            {categories.map((category) => (
+              <Nav.Item key={category}>
+                <LinkContainer
+                  to={`/search?category=${category}`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <Nav.Link>{category}</Nav.Link>
+                </LinkContainer>
+              </Nav.Item>
+            ))}
+          </Nav>
+        </div>
+
         <main>
           <Container className="mt-3">
             <Routes>
@@ -118,7 +178,7 @@ function App() {
               <Route path="/orderhistory" element={<OrderHistoryScreen />} />
               <Route path="/profile" element={<UserProfileScreen />} />
               <Route path="/checkoutsuccess" element={<CheckoutSuccess />} />
-              
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Container>
         </main>
