@@ -27,6 +27,8 @@ import { getError } from './components/main_components/utils.js';
 import SearchBox from './components/main_components/SearchBox.js';
 import NotFound from './components/main_components/NotFound.js';
 import SearchScreen from './components/screens/SearchScreen.js';
+import DashboardScreen from './components/screens/Admin/DashboardScreen.js';
+import AdminRouteMain from './components/screens/Admin/AdminRouteMain.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -133,6 +135,30 @@ function App() {
                       Sign In
                     </Link>
                   )}
+
+                  {userInfo && userInfo.isAdmin && (
+                    <NavDropdown
+                      title="Admin"
+                      id="basic-nav-dropdown"
+                      className="nav-link"
+                    >
+                      <LinkContainer to="/admin/dashboard">
+                        <NavDropdown.Item>Dashboard</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/productlist">
+                        <NavDropdown.Item>Products</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/orderlist">
+                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/admin/userlist">
+                        <NavDropdown.Item>Users</NavDropdown.Item>
+                      </LinkContainer>
+                    </NavDropdown>
+                  )}
                 </Nav>
               </Navbar.Collapse>
             </Container>
@@ -180,7 +206,17 @@ function App() {
               <Route path="/profile" element={<UserProfileScreen />} />
               <Route path="/checkoutsuccess" element={<CheckoutSuccess />} />
               <Route path="/search" element={<SearchScreen />} />
-              {/* <Route path="*" element={<NotFound />} /> */}
+              <Route path="*" element={<NotFound />} />
+
+              {/**Admin Routes */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <AdminRouteMain>
+                    <DashboardScreen />
+                  </AdminRouteMain>
+                }
+              />
             </Routes>
           </Container>
         </main>

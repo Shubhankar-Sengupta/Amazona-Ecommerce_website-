@@ -63,8 +63,10 @@ function PlaceOrderScreen() {
   useEffect(() => {
     if (!paymentMethod) {
       navigate('/payment');
+    } else if (!userInfo) {
+      navigate('/signin');
     }
-  }, [navigate, cart]);
+  }, [navigate, cart, userInfo]);
 
   const placeOrderHandler = async () => {
     try {
