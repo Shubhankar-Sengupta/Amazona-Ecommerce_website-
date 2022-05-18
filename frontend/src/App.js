@@ -26,6 +26,7 @@ import axios from 'axios';
 import { getError } from './components/main_components/utils.js';
 import SearchBox from './components/main_components/SearchBox.js';
 import NotFound from './components/main_components/NotFound.js';
+import SearchScreen from './components/screens/SearchScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -178,7 +179,8 @@ function App() {
               <Route path="/orderhistory" element={<OrderHistoryScreen />} />
               <Route path="/profile" element={<UserProfileScreen />} />
               <Route path="/checkoutsuccess" element={<CheckoutSuccess />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="/search" element={<SearchScreen />} />
+              {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </Container>
         </main>
