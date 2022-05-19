@@ -98,7 +98,7 @@ function SearchScreen() {
         );
         dispatch({ type: 'Fetch_Success', payload: data });
       } catch (err) {
-        dispatch({ type: 'Fetch_Fail', payload: getError(error) });
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
       }
     };
 

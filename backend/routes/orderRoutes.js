@@ -1,7 +1,9 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/order.js';
-import { isAuth } from '../utils.js';
+import Product from '../models/Product.js';
+import User from '../models/User.js';
+import { isAuth, isAdmin } from '../utils.js';
 
 const orderRouter = express.Router();
 
@@ -31,8 +33,55 @@ orderRouter.post(
     });
 
     const order = await newOrder.save();
-
     res.status(201).send({ message: 'New Order Created', order });
+  })
+);
+
+orderRouter.get(
+  '/summary',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const users = await User.aggregate([
+      {
+        $group: { _id: null, countUsers: { $sum: 1 } },
+      },
+    ]);
+
+    const orders = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          countOrders: { $sum: 1 },
+          totalSales: { $sum: '$totalSales' }, // based on the field of totalSales and returned as totalSales
+        },
+      },
+    ]);
+
+    const dailyOrders = await Order.aggregate([
+      // first pipeline as array of objects.
+      // orders and sales is returned to the front-end.
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+          orders: { $sum: 1 },
+          sales: { $sum: '$totalSales' }, // fields from which we take the aggregate.
+        },
+      },
+
+      { $sort: { _id: 1 } },
+    ]);
+
+    const productCategories = await Product.aggregate([
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    res.send({ users, orders, dailyOrders, productCategories });
   })
 );
 
