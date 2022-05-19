@@ -1,6 +1,7 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import expressAsyncHandler from 'express-async-handler';
+import { isAdmin, isAuth } from '../utils.js';
 const productsRoutes = express.Router();
 
 productsRoutes.get('/', async (req, res) => {
@@ -23,7 +24,6 @@ productsRoutes.get(
 productsRoutes.get(
   '/search',
   expressAsyncHandler(async (req, res) => {
-
     const PAGE_SIZE = 3;
 
     const { query } = req;
@@ -35,8 +35,6 @@ productsRoutes.get(
     const searchQuery = query.query || '';
     const order = query.order || '';
     const rating = query.rating || '';
-
-
 
     // filter starting.
     const queryFilters =
@@ -83,8 +81,7 @@ productsRoutes.get(
         ? { createdAt: -1 }
         : { _id: -1 };
 
-
-  // filter end
+    // filter end
 
     const products = await Product.find({
       ...queryFilters,
@@ -106,6 +103,29 @@ productsRoutes.get(
     res.send({
       products,
       countProducts,
+      page,
+      pages: Math.ceil(countProducts / pageSize),
+    });
+  })
+);
+
+productsRoutes.get(
+  '/admin',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const { query } = req;
+    const pageSize = 3;
+    const page = query.page || 1;
+
+    const products = await Product.find()
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+
+    const countProducts = await Product.countDocuments();
+
+    res.send({
+      products,
       page,
       pages: Math.ceil(countProducts / pageSize),
     });

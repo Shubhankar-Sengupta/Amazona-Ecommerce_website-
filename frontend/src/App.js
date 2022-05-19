@@ -29,6 +29,7 @@ import NotFound from './components/main_components/NotFound.js';
 import SearchScreen from './components/screens/SearchScreen.js';
 import DashboardScreen from './components/screens/Admin/DashboardScreen.js';
 import AdminRouteMain from './components/screens/Admin/AdminRouteMain.js';
+import ProductListScreen from './components/screens/Admin/ProductListScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -146,15 +147,15 @@ function App() {
                         <NavDropdown.Item>Dashboard</NavDropdown.Item>
                       </LinkContainer>
 
-                      <LinkContainer to="/admin/productlist">
+                      <LinkContainer to="/admin/products">
                         <NavDropdown.Item>Products</NavDropdown.Item>
                       </LinkContainer>
 
-                      <LinkContainer to="/admin/orderlist">
+                      <LinkContainer to="/admin/orders">
                         <NavDropdown.Item>Orders</NavDropdown.Item>
                       </LinkContainer>
 
-                      <LinkContainer to="/admin/userlist">
+                      <LinkContainer to="/admin/users">
                         <NavDropdown.Item>Users</NavDropdown.Item>
                       </LinkContainer>
                     </NavDropdown>
@@ -214,6 +215,15 @@ function App() {
                 element={
                   <AdminRouteMain>
                     <DashboardScreen />
+                  </AdminRouteMain>
+                }
+              />
+
+              <Route
+                path="/admin/products/"
+                element={
+                  <AdminRouteMain>
+                    <ProductListScreen />
                   </AdminRouteMain>
                 }
               />
