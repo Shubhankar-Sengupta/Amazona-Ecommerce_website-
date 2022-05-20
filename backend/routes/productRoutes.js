@@ -13,6 +13,30 @@ productsRoutes.get('/', async (req, res) => {
   }
 });
 
+productsRoutes.post(
+  '/',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const newProduct = await Product.create({
+      name: 'sample name ' + Date.now(),
+      slug: 'sample-slug- ' + Date.now(),
+      category: 'Unknown',
+      image: '/images/p2.jpg',
+      price: 0,
+      countInStock: 0,
+      brand: 'Unknown',
+      rating: 0,
+      numReviews: 0,
+      description: 'Sample Description',
+    });
+
+    const product = await newProduct.save();
+
+    res.send({ message: 'Product Created successfully', product });
+  })
+);
+
 productsRoutes.get(
   '/categories',
   expressAsyncHandler(async (req, res) => {
