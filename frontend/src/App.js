@@ -30,6 +30,7 @@ import SearchScreen from './components/screens/SearchScreen.js';
 import DashboardScreen from './components/screens/Admin/DashboardScreen.js';
 import AdminRouteMain from './components/screens/Admin/AdminRouteMain.js';
 import ProductListScreen from './components/screens/Admin/ProductListScreen.js';
+import ProductEditScreen from './components/screens/Admin/ProductEditScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -224,6 +225,14 @@ function App() {
                 element={
                   <AdminRouteMain>
                     <ProductListScreen />
+                  </AdminRouteMain>
+                }
+              />
+              <Route
+                path="/admin/product/:id"
+                element={
+                  <AdminRouteMain>
+                    <ProductEditScreen />
                   </AdminRouteMain>
                 }
               />
