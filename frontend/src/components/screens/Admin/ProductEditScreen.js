@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Helmet } from 'react-helmet-async';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Store } from '../../../Store';
 import Loader from '../../main_components/Loader';
@@ -29,6 +29,20 @@ const reducer = (state, action) => {
     case 'Fetch_Fail': {
       return { ...state, error: action.payload, loading: false };
     }
+    case 'Update_Request': {
+      return { ...state, loading: true, loadingUpdate: true };
+    }
+    case 'Update_Success': {
+      return { ...state, loading: false, loadingUpdate: false };
+    }
+    case 'Update_Fail': {
+      return {
+        ...state,
+        error: action.payload,
+        loading: false,
+        loadingUpdate: false,
+      };
+    }
 
     default: {
       return state;
@@ -39,6 +53,8 @@ const reducer = (state, action) => {
 function ProductEditScreen() {
   const params = useParams();
   const { id: productId } = params;
+
+  const navigate = useNavigate();
 
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -68,10 +84,45 @@ function ProductEditScreen() {
     fetchData();
   }, [productId]); // this side effect runs conditionally when productId changes
 
-  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+  const [{ loading, error, product, loadingUpdate }, dispatch] = useReducer(
+    reducer,
+    {
+      loading: true,
+      error: '',
+    }
+  );
+
+  const updateHandler = async (e) => {
+    e.preventDefault();
+
+    try {
+      dispatch({ type: 'Update_Request' });
+      await axios.put(
+        `/api/products/${productId}`,
+        {
+          _id: productId,
+          name,
+          slug,
+          category,
+          image,
+          price,
+          countInStock,
+          brand,
+          rating,
+          numReviews,
+          description,
+        },
+        { headers: { authorization: `Bearer ${userInfo.token}` } }
+      );
+
+      dispatch({ type: 'Update_Success' });
+      toast.success('Data updated successfully');
+      navigate('/admin/products');
+    } catch (err) {
+      dispatch({ type: 'Update_Fail', payload: getError(err) });
+      toast.error(getError(err));
+    }
+  };
 
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
@@ -94,7 +145,7 @@ function ProductEditScreen() {
       {loading ? (
         <Loader />
       ) : error ? (
-        <Message />
+        <Message>{error}</Message>
       ) : (
         <Form>
           <Form.Group className="mb-3" controlId="name">
@@ -189,7 +240,10 @@ function ProductEditScreen() {
           </Form.Group>
 
           <div className="mb-3">
-            <Button type="submit">Update</Button>
+            <Button type="submit" onClick={updateHandler}>
+              Update
+            </Button>
+            {loadingUpdate && <Loader />}
           </div>
         </Form>
       )}

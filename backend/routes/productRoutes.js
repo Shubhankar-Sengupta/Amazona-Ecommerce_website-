@@ -9,9 +9,56 @@ productsRoutes.get('/', async (req, res) => {
   if (products) {
     res.send(products);
   } else {
-    res.status(404).send({ message: 'No Products to display' });
+    res.status(404).send({
+      message: 'No Products to display',
+    });
   }
 });
+
+productsRoutes.put(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const {
+      name,
+      slug,
+      category,
+      image,
+      price,
+      countInStock,
+      brand,
+      rating,
+      numReviews,
+      description,
+    } = req.body;
+
+    const checkProduct = await Product.findById(id);
+
+    if (checkProduct) {
+      checkProduct.name = name;
+      checkProduct.slug = slug;
+      checkProduct.category = category;
+      checkProduct.image = image;
+      checkProduct.price = price;
+      checkProduct.countInStock = countInStock;
+      checkProduct.brand = brand;
+      checkProduct.rating = rating;
+      checkProduct.numReviews = numReviews;
+      checkProduct.description = description;
+
+      await checkProduct.save();
+      res.send({
+        message: 'Product updated successfully',
+      });
+    } else {
+      res.send({
+        message: 'Product not found',
+      });
+    }
+  })
+);
 
 productsRoutes.post(
   '/',
@@ -33,7 +80,10 @@ productsRoutes.post(
 
     const product = await newProduct.save();
 
-    res.send({ message: 'Product Created successfully', product });
+    res.send({
+      message: 'Product Created successfully',
+      product,
+    });
   })
 );
 
@@ -71,7 +121,12 @@ productsRoutes.get(
           }
         : {};
 
-    const categoryFilter = category && category !== 'all' ? { category } : {};
+    const categoryFilter =
+      category && category !== 'all'
+        ? {
+            category,
+          }
+        : {};
 
     const priceFilter =
       price && price !== 'all'
@@ -94,16 +149,28 @@ productsRoutes.get(
 
     const sortOrder =
       order === 'featured'
-        ? { featured: -1 }
+        ? {
+            featured: -1,
+          }
         : order === 'toprated'
-        ? { rating: -1 }
+        ? {
+            rating: -1,
+          }
         : order === 'highest'
-        ? { price: -1 }
+        ? {
+            price: -1,
+          }
         : order === 'lowest'
-        ? { price: 1 }
+        ? {
+            price: 1,
+          }
         : order === 'newest'
-        ? { createdAt: -1 }
-        : { _id: -1 };
+        ? {
+            createdAt: -1,
+          }
+        : {
+            _id: -1,
+          };
 
     // filter end
 
@@ -157,12 +224,16 @@ productsRoutes.get(
 );
 
 productsRoutes.get('/slug/:slug', async (req, res) => {
-  const product = await Product.findOne({ slug: req.params.slug });
+  const product = await Product.findOne({
+    slug: req.params.slug,
+  });
 
   if (product) {
     res.send(product);
   } else {
-    res.status(404).send({ message: 'Oops!! Product Not Found' });
+    res.status(404).send({
+      message: 'Oops!! Product Not Found',
+    });
   }
 });
 
@@ -172,7 +243,9 @@ productsRoutes.get('/:id', async (req, res) => {
   if (product) {
     res.send(product);
   } else {
-    res.status(404).send({ message: 'Oops!! Product Not Found' });
+    res.status(404).send({
+      message: 'Oops!! Product Not Found',
+    });
   }
 });
 
