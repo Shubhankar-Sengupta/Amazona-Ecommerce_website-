@@ -60,6 +60,23 @@ productsRoutes.put(
   })
 );
 
+productsRoutes.delete(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const id = req.params.id;
+    const product = await Product.findById(id);
+
+    if (product) {
+      await product.remove();
+      res.send({ message: 'Product deleted successfully' });
+    } else {
+      res.status(404).send({ message: 'Product not found' });
+    }
+  })
+);
+
 productsRoutes.post(
   '/',
   isAuth,

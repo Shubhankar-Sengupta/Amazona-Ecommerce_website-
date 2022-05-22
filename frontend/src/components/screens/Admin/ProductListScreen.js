@@ -46,6 +46,32 @@ const reducer = (state, action) => {
     case 'Create_Fail': {
       return { ...state, error: action.payload, loadingProduct: false };
     }
+    case 'Delete_Request': {
+      return { ...state, successDelete: false, loadingDelete: true };
+    }
+
+    case 'Delete_Success': {
+      return {
+        ...state,
+        successDelete: true,
+        loadingDelete: false,
+      };
+    }
+
+    case 'Delete_Fail': {
+      return {
+        ...state,
+        successDelete: false,
+        loadingDelete: false,
+      };
+    }
+    case 'Delete_Reset': {
+      return {
+        ...state,
+        successDelete: false,
+        loadingDelete: false,
+      };
+    }
 
     default: {
       return state;
@@ -54,11 +80,21 @@ const reducer = (state, action) => {
 };
 
 function ProductListScreen() {
-  const [{ loading, products, error, pages, loadingProduct }, dispatch] =
-    useReducer(reducer, {
-      loading: true,
-      error: '',
-    });
+  const [
+    {
+      loading,
+      products,
+      error,
+      pages,
+      loadingProduct,
+      loadingDelete,
+      successDelete,
+    },
+    dispatch,
+  ] = useReducer(reducer, {
+    loading: true,
+    error: '',
+  });
 
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -84,8 +120,31 @@ function ProductListScreen() {
       }
     };
 
-    fetchData();
-  }, [userInfo, page]); // consitionally run the effect which re-renders the component.
+    if (successDelete) {
+      dispatch({ type: 'Delete_Reset' });
+    } else {
+      fetchData();
+    }
+  }, [userInfo, page, successDelete]); // consitionally run the effect which re-renders the component.
+
+  const deleteHandler = async (product) => {
+    try {
+      if (window.confirm('Are you sure you want to delete this product?')) {
+        dispatch({ type: 'Delete_Request' });
+        const { data } = await axios.delete(`/api/products/${product._id}`, {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        dispatch({ type: 'Delete_Success' });
+        toast.success(data.message);
+        navigate(`/admin/products`);
+      } else {
+        toast.error('Deletion not initiated');
+      }
+    } catch (err) {
+      dispatch({ type: 'Delete_Fail' });
+      toast.error(getError(err));
+    }
+  };
 
   const clickHandler = (e) => {
     e.preventDefault();
@@ -156,12 +215,23 @@ function ProductListScreen() {
                   <td>{product.brand}</td>
                   <td>
                     <Button
+                      className="mx-2"
                       variant="light"
                       onClick={() => {
                         navigate(`/admin/product/${product._id}`);
                       }}
                     >
                       Edit
+                    </Button>
+
+                    <Button
+                      variant="light"
+                      onClick={() => {
+                        deleteHandler(product);
+                      }}
+                    >
+                      Delete
+                      {loadingDelete && <Loader />}
                     </Button>
                   </td>
                 </tr>
