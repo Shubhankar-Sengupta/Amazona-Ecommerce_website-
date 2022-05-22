@@ -30,17 +30,29 @@ const reducer = (state, action) => {
       return { ...state, error: action.payload, loading: false };
     }
     case 'Update_Request': {
-      return { ...state, loading: true, loadingUpdate: true };
+      return { ...state, loadingUpdate: true };
     }
     case 'Update_Success': {
-      return { ...state, loading: false, loadingUpdate: false };
+      return { ...state, loadingUpdate: false };
     }
     case 'Update_Fail': {
       return {
         ...state,
         error: action.payload,
-        loading: false,
         loadingUpdate: false,
+      };
+    }
+    case 'Upload_Request': {
+      return { ...state, loadingUpload: true, errorUpload: '' };
+    }
+    case 'Upload_Success': {
+      return { ...state, loadingUpload: false, errorUpload: '' };
+    }
+    case 'Upload_Fail': {
+      return {
+        ...state,
+        errorUpload: action.payload,
+        loadingUpload: false,
       };
     }
 
@@ -84,13 +96,34 @@ function ProductEditScreen() {
     fetchData();
   }, [productId]); // this side effect runs conditionally when productId changes
 
-  const [{ loading, error, product, loadingUpdate }, dispatch] = useReducer(
-    reducer,
-    {
+  const [{ loading, error, product, loadingUpdate, loadingUpload }, dispatch] =
+    useReducer(reducer, {
       loading: true,
       error: '',
+    });
+
+  const fileUploader = async (e) => {
+    const file = e.target.files[0]; // getting the first file from the e.target.files Nodelist
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      dispatch({ type: 'Upload_Request' });
+      const { data } = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+      console.log(data);
+      dispatch({ type: 'Upload_Success' });
+      toast.success('Image Uploaded successfully');
+      setImage(data.secure_url);
+    } catch (err) {
+      dispatch({ type: 'Upload_Fail', payload: err });
+      toast.error(getError(err));
     }
-  );
+  };
 
   const updateHandler = async (e) => {
     e.preventDefault();
@@ -184,6 +217,13 @@ function ProductEditScreen() {
               }}
             ></Form.Control>
           </Form.Group>
+
+          <Form.Group className="mb-3" controlId="imageFile">
+            <Form.Label>Upload Image</Form.Label>
+            <Form.Control type="file" onChange={fileUploader}></Form.Control>
+            {loadingUpload && <Loader />}
+          </Form.Group>
+
           <Form.Group className="mb-3" controlId="price">
             <Form.Label>Price</Form.Label>
             <Form.Control

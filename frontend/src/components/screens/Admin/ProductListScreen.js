@@ -161,7 +161,7 @@ function ProductListScreen() {
                         navigate(`/admin/product/${product._id}`);
                       }}
                     >
-                      Click
+                      Edit
                     </Button>
                   </td>
                 </tr>

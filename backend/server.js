@@ -8,6 +8,7 @@ import orderRouter from './routes/orderRoutes.js';
 import path from 'path';
 import stripeRouter from './routes/stripeRoutes.js';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
+import uploadRouter from './routes/uploadRoutes.js';
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();
@@ -41,6 +42,8 @@ app.use('/api/orders', orderRouter);
 app.use('/api/users', userRouter);
 
 app.use('/api/stripe', stripeRouter);
+
+app.use('/api/upload', uploadRouter);
 
 const __dirname = path.resolve();
 
