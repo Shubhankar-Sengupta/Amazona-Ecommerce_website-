@@ -19,7 +19,8 @@ main {
   flex: 1;
 }
 
-.btn-primary, .btn-outline-primary {
+.btn-primary,
+.btn-outline-primary {
   background-color: #f0c040;
   color: #000;
 }
@@ -75,14 +76,16 @@ main {
   background-color: #100901;
 }
 
-
 .site-container {
-  transition: .4s;
-
+  transition: 0.4s;
 }
 
 .active-cont {
   margin-left: 240px;
+}
+
+.active-cont a {
+  color: #fff;
 }
 
 .active-nav {
