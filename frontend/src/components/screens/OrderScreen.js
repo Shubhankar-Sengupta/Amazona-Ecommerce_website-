@@ -10,8 +10,7 @@ import Loader from '../main_components/Loader.js';
 import Message from '../main_components/Message.js';
 import { Store } from '../../Store';
 import ListGroup from 'react-bootstrap/ListGroup';
-import StripeScreen from './StripeScreen.js';
-import { loadStripe } from '@stripe/stripe-js';
+import CheckoutFormScreen from './CheckoutFormScreen.js';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -42,8 +41,7 @@ function OrderScreen() {
     error: '',
   });
 
-  const [stripePromise, setStripePromise] = useState('');
-
+  
   const { state } = useContext(Store);
 
   const { userInfo } = state;
@@ -68,15 +66,6 @@ function OrderScreen() {
 
     if (!order._id || (order._id && order._id !== orderId)) {
       fetchData();
-    } else {
-      const load_Stripe = async () => {
-        const stripePromise = loadStripe(
-          'pk_test_51Kjj2QSJxaR9wFZemlzlFMaM470OJciNKcKSNqWbTPP8t4VDzjFLdUEwm31wMQWL4Py7uHZUqvQqBPUfoXilYosU00rV99Bd0e'
-        );
-        setStripePromise(stripePromise);
-      };
-
-      load_Stripe();
     }
   }, [userInfo, orderId, navigate, order]);
 
@@ -198,16 +187,14 @@ function OrderScreen() {
                   </Row>
                 </ListGroup.Item>
 
-                {!order.isPaid && (
-                  <ListGroup.Item>
-                    <Row>
-                      <StripeScreen
-                        order={order}
-                        stripePromise={stripePromise}
-                      />
-                    </Row>
-                  </ListGroup.Item>
-                )}
+                {order &&
+                  !order.isPaid &&
+                  userInfo &&
+                  userInfo._id === order.user && (
+                    <ListGroup.Item>
+                      <Row>{<CheckoutFormScreen order={order} />}</Row>
+                    </ListGroup.Item>
+                  )}
               </ListGroup>
             </Card.Body>
           </Card>

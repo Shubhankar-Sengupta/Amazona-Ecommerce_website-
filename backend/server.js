@@ -9,6 +9,7 @@ import path from 'path';
 import stripeRouter from './routes/stripeRoutes.js';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import uploadRouter from './routes/uploadRoutes.js';
+import cors from 'cors';
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();
@@ -25,9 +26,10 @@ mongoose
 
 const app = express();
 
-// app.use(cors());
+app.use(cors({ origin: true }));
 
 app.use(ExpressMongoSanitize());
+
 
 app.use(express.json());
 

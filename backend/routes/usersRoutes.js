@@ -1,12 +1,29 @@
 import express from 'express';
 import User from '../models/User.js';
 import bcyrpt from 'bcryptjs';
-import { generateToken } from '../utils.js';
+import { generateToken, isAdmin } from '../utils.js';
 import expressAsyncHandler from 'express-async-handler';
 import { isAuth } from '../utils.js';
 import bcrypt from 'bcryptjs';
 
 const userRouter = express.Router();
+
+// route for fetching all users from
+
+userRouter.get(
+  '/',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const users = await User.find({});
+
+    if (users) {
+      res.send(users);
+    } else {
+      res.send({ message: 'No users found' });
+    }
+  })
+);
 
 // route for sign-in.
 userRouter.post(
@@ -69,7 +86,6 @@ userRouter.put(
     if (user) {
       user.name = name || user.name;
       user.email = email || user.email;
-
 
       // code stops here to execute.
       if (password) {

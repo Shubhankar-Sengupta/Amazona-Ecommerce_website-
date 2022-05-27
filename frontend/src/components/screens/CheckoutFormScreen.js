@@ -1,100 +1,149 @@
-import {
-  PaymentElement,
-  useElements,
-  useStripe,
-} from '@stripe/react-stripe-js';
+import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react';
-import Loader from '../main_components/Loader';
 import { Store } from '../../Store.js';
+import { getError } from '../main_components/utils.js';
 
-function CheckoutFormScreen({ order }) {
+function CheckoutFormScreen(props) {
+  const [succeeded, setSucceeded] = useState(false);
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState('');
+  const [disabled, setDisabled] = useState(true);
+  const [clientSecret, setClientSecret] = useState('');
+
   const stripe = useStripe();
   const elements = useElements();
 
-  const {
-    state: { userInfo },
-  } = useContext(Store);
+  const { state } = useContext(Store);
 
-  const [message, setMessage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const { userInfo } = state;
+  const { order } = props;
+  const { shippingAddress } = order;
+  const { city, postalCode, fullName } = shippingAddress;
 
   useEffect(() => {
-    if (!stripe) {
-      return;
-    }
-
-    const clientSecret = new URLSearchParams(window.location.search).get(
-      'payment_intent_client_secret'
-    );
-
-    if (!clientSecret) {
-      return;
-    }
-
-    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
-      switch (paymentIntent.status) {
-        case 'succeeded':
-          setMessage('Payment succeeded!');
-          break;
-        case 'processing':
-          setMessage('Your payment is processing.');
-          break;
-        case 'requires_payment_method':
-          setMessage('Your payment was not successful, please try again.');
-          break;
-        default:
-          setMessage('Something went wrong.');
-          break;
+    // Create PaymentIntent as soon as the page loads
+    const fetchPaymentIntent = async () => {
+      try {
+        const { data } = await axios.post(
+          '/api/stripe/create-payment-intent',
+          { order },
+          {
+            headers: {
+              authorization: `Bearer ${userInfo.token}`,
+            },
+          }
+        );
+        setClientSecret(data.clientSecret);
+      } catch (err) {
+        getError(err);
       }
-    });
-  }, [stripe]);
+    };
+
+    fetchPaymentIntent();
+  }, [userInfo]);
+
+  const cardStyle = {
+    hidePostalCode: true,
+    style: {
+      base: {
+        color: '#32325d',
+        fontFamily: 'Arial, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '1.15rem',
+        '::placeholder': {
+          color: '#32325d',
+        },
+      },
+      invalid: {
+        fontFamily: 'Arial, sans-serif',
+        color: '#fa755a',
+        iconColor: '#fa755a',
+      },
+    },
+  };
+
+  const handleChange = async (e) => {
+    // Listen for changes in the CardElement
+    // and display any errors as the customer types their card details
+    setDisabled(e.empty);
+    setError(e.error ? e.error.message : '');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setProcessing(true);
 
-    if (!stripe || !elements) {
-      // Stripe.js has not yet loaded.
-      // Make sure to disable form submission until Stripe.js has loaded.
-      return;
-    }
-
-    setIsLoading(true);
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        // Make sure to change this to your payment completion page
-        return_url: 'http://localhost:3000/checkoutsuccess',
-        payment_method_data: {
-          billing_details: {
-            email: userInfo.email,
-          },
+    const payload = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+        billing_details: {
+          name: fullName,
+          email: userInfo.email,
+          address: { city, postal_code: postalCode },
         },
       },
     });
 
-    if (error.type === 'card_error' || error.type === 'validation_error') {
-      setMessage(error.message);
+    if (payload.error) {
+      setError(`Payment failed ${payload.error.message}`);
+      setProcessing(false);
     } else {
-      setMessage('An unexpected error occured.');
+      setError(null);
+      setProcessing(false);
+      setSucceeded(true);
     }
-
-    setIsLoading(false);
   };
 
   return (
-    <form id="payment-form" onSubmit={handleSubmit}>
-      <PaymentElement id="payment-element" />
-      <button
-        className="btn btn-primary mt-2"
-        disabled={isLoading || !stripe || !elements}
-        id="submit"
+    <>
+      <form
+        id="payment-form"
+        className="checkout-form py-5"
+        onSubmit={handleSubmit}
       >
-        <span id="button-text">{isLoading ? <Loader /> : 'Pay now'}</span>
-      </button>
-      {/* Show any error or success messages */}
-      {message && <div id="payment-message">{message}</div>}
-    </form>
+        <h5 className="payment">Pay Here</h5>
+
+        <CardElement
+          className="mb-3"
+          id="card-element"
+          options={cardStyle}
+          onChange={handleChange}
+        />
+
+        <button
+          className="btn btn-primary"
+          disabled={processing || disabled || succeeded}
+          id="submit"
+        >
+          <span id="button-text">
+            {processing ? (
+              <div className="spinner" id="spinner"></div>
+            ) : (
+              'Pay now'
+            )}
+          </span>
+        </button>
+
+        {/* Show any error that happens when processing the payment */}
+
+        {error && (
+          <div className="card-error" role="alert">
+            {error}
+          </div>
+        )}
+
+        {/* Show a success message upon completion */}
+
+        <p className={succeeded ? 'result-message' : 'result-message hidden'}>
+          Payment succeeded, see the result in your
+          <a href={`https://dashboard.stripe.com/test/payments`}>
+            {' '}
+            Stripe dashboard.
+          </a>{' '}
+        </p>
+      </form>
+    </>
   );
 }
 
