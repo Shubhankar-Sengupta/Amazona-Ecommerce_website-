@@ -225,7 +225,7 @@
     2. implement backen api
     3. fetch and display orders
 
-43. List Users & Checkout Pay Enhancement
+43. List Users & Checkout Pay Enhancement & rectified an error of including message component
     1. create user list screen
     2. implement backen api
     3. fetch and display users

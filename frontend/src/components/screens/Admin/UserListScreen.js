@@ -1,8 +1,9 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import Spinner from 'react-bootstrap/esm/Spinner';
 import { Helmet } from 'react-helmet-async';
 import { Store } from '../../../Store';
+import Message from '../../main_components/Message';
 import { getError } from '../../main_components/utils';
 
 const reducer = (state, action) => {
