@@ -22,6 +22,13 @@ const initialState = {
       ? JSON.parse(localStorage.getItem('shippingAddress'))
       : {},
   },
+
+  // special case for Order screen.
+  loading: true,
+  error: '',
+  loadingPay: false,
+  successPay: false,
+  order: {},
 };
 
 // reducer function first takes a state argument and second is the action object which updates the state(UI) using useReducer.
@@ -106,6 +113,38 @@ function reducer(state, action) {
       };
     }
 
+    case 'Fetch_Request_Order':
+      return { ...state, loading: true, error: '' };
+
+    case 'Fetch_Success_Order':
+      return { ...state, loading: false, order: action.payload, error: '' };
+
+    case 'Fetch_Fail_Order':
+      return { ...state, loading: false, error: action.payload };
+
+    case 'Pay_Request_Order':
+      return { ...state, loadingPay: true };
+
+    case 'Pay_Success_Order':
+      return {
+        ...state,
+        successPay: true,
+        payment: action.payload,
+        loadingPay: false,
+      };
+
+    case 'Pay_Fail_Order':
+      return {
+        ...state,
+        successPay: false,
+        loadingPay: false,
+        error: action.payload,
+      };
+
+    case 'Pay_Reset_Order': {
+      return { ...state, successPay: false, loadingPay: false, error: '' };
+    }
+
     default:
       return state;
   }
@@ -118,7 +157,6 @@ export function StoreProvider(props) {
 
   // this is to be passed to the <Store.Provider/>
   const value = { state, dispatch };
-
 
   // this would provide access of the Context store to the entire component tree encapsulated within from it's nearest Provider.
   return <Store.Provider value={value}>{props.children}</Store.Provider>;

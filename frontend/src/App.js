@@ -90,7 +90,6 @@ function App() {
               </LinkContainer>
 
               <ToastContainer position="top-center" limit={1} />
-
               <Navbar.Toggle aria-controls="basic-control-nav" />
 
               <Navbar.Collapse id="basic-control-nav">

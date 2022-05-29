@@ -14,7 +14,7 @@ function CheckoutFormScreen(props) {
   const stripe = useStripe();
   const elements = useElements();
 
-  const { state } = useContext(Store);
+  const { state, dispatch } = useContext(Store);
 
   const { userInfo } = state;
   const { order } = props;
@@ -39,7 +39,6 @@ function CheckoutFormScreen(props) {
         getError(err);
       }
     };
-
     fetchPaymentIntent();
   }, [userInfo]);
 
@@ -74,6 +73,7 @@ function CheckoutFormScreen(props) {
     e.preventDefault();
     setProcessing(true);
 
+    dispatch({ type: 'Pay_Request_Order' });
     const payload = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: elements.getElement(CardElement),
@@ -85,7 +85,15 @@ function CheckoutFormScreen(props) {
       },
     });
 
+    if (payload.paymentIntent && payload.paymentIntent.status === 'succeeded') {
+      dispatch({ type: 'Pay_Success_Order', payload: payload.paymentIntent });
+    }
+
     if (payload.error) {
+      dispatch({
+        type: 'Pay_Fail_Order',
+        payload: getError(payload.error),
+      });
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {

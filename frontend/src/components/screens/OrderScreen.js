@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer, useState } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
@@ -11,22 +11,25 @@ import Message from '../main_components/Message.js';
 import { Store } from '../../Store';
 import ListGroup from 'react-bootstrap/ListGroup';
 import CheckoutFormScreen from './CheckoutFormScreen.js';
+import Button from 'react-bootstrap/Button';
+import { toast } from 'react-toastify';
 
-function reducer(state, action) {
+const reducer = (state, action) => {
   switch (action.type) {
-    case 'Fetch_Request':
-      return { ...state, loading: true, error: '' };
-
-    case 'Fetch_Success':
-      return { ...state, loading: false, order: action.payload, error: '' };
-
-    case 'Fetch_Fail':
-      return { ...state, loading: false, error: action.payload };
-
-    default:
-      return state;
+    case 'Deliver_Request':
+      return { ...state, loadingDeliver: true };
+    case 'Deliver_Success':
+      return { ...state, loadingDeliver: false, successDeliver: true };
+    case 'Deliver_Fail':
+      return { ...state, loadingDeliver: false };
+    case 'Deliver_Reset':
+      return {
+        ...state,
+        loadingDeliver: false,
+        successDeliver: false,
+      };
   }
-}
+};
 
 function OrderScreen() {
   const params = useParams();
@@ -35,28 +38,26 @@ function OrderScreen() {
 
   const navigate = useNavigate();
 
-  const [{ loading, error, order }, dispatch] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
+  const { state, dispatch: cxtDispatch } = useContext(Store);
+
+  const { userInfo, loading, error, order, successPay, payment } = state;
+
+  const [{ loadingDeliver, successDeliver }, dispatch] = useReducer(reducer, {
+    loadingDeliver: false,
+    successDeliver: false,
   });
-
-  
-  const { state } = useContext(Store);
-
-  const { userInfo } = state;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        dispatch({ type: 'Fetch_Request' });
+        cxtDispatch({ type: 'Fetch_Request_Order' });
         const { data } = await axios.get(`/api/orders/${orderId}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
 
-        dispatch({ type: 'Fetch_Success', payload: data });
+        cxtDispatch({ type: 'Fetch_Success_Order', payload: data });
       } catch (err) {
-        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
+        cxtDispatch({ type: 'Fetch_Fail_Order', payload: getError(err) });
       }
     };
 
@@ -64,10 +65,56 @@ function OrderScreen() {
       return navigate('/signin');
     }
 
-    if (!order._id || (order._id && order._id !== orderId)) {
+    if (
+      !order._id ||
+      successDeliver ||
+      successPay ||
+      (order._id && order._id !== orderId)
+    ) {
       fetchData();
+
+      if (successDeliver) {
+        dispatch({ type: 'Deliver_Reset' });
+      }
     }
-  }, [userInfo, orderId, navigate, order]);
+  }, [userInfo, orderId, navigate, order, successPay, successDeliver]);
+
+  useEffect(() => {
+    if (successPay) {
+      const payResult = async () => {
+        try {
+          await axios.post(
+            `/api/orders/pay`,
+            { orderID: order._id, payment },
+            { headers: { authorization: `Bearer ${userInfo.token}` } }
+          );
+          cxtDispatch({ type: 'Pay_Reset_Order' });
+          toast.success('Order paid successfully');
+        } catch (err) {
+          cxtDispatch({ type: 'Fetch_Fail_Order', payload: getError(err) });
+        }
+      };
+      payResult();
+    }
+  }, [successPay]);
+
+  const deliverOrderHandler = async () => {
+    try {
+      dispatch({ type: 'Deliver_Request' });
+      const { data } = await axios.put(
+        `/api/orders/${order._id}/deliver`,
+        {},
+        {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      dispatch({ type: 'Deliver_Success', payload: data });
+      toast.success('Order is delivered');
+    } catch (err) {
+      toast.error(getError(err));
+      dispatch({ type: 'Deliver_Fail' });
+    }
+  };
 
   return loading ? (
     <Loader></Loader>
@@ -79,7 +126,6 @@ function OrderScreen() {
         <title>Order {orderId}</title>
       </Helmet>
       <h1 className="mb-3">Order {orderId}</h1>
-
       <Row>
         <Col md={8}>
           <Card className="mb-3">
@@ -95,7 +141,10 @@ function OrderScreen() {
                 {order.shippingAddress.country}
               </Card.Text>
               {order.isDelivered ? (
-                <Message variant="success">{order.deliveredAt}</Message>
+                <Message variant="success">
+                  <strong>Delivered At:</strong>{' '}
+                  {order.deliveredAt.substring(0, 10)}
+                </Message>
               ) : (
                 <Message variant="danger">Not Delivered</Message>
               )}
@@ -111,7 +160,10 @@ function OrderScreen() {
               </Card.Text>
 
               {order.isPaid ? (
-                <Message variant="success">{order.paidAt}</Message>
+                <Message variant="success">
+                  {' '}
+                  <strong>Paid At:</strong> {order.paidAt.substring(0, 10)}
+                </Message>
               ) : (
                 <Message variant="danger">Not Paid</Message>
               )}
@@ -193,6 +245,20 @@ function OrderScreen() {
                   userInfo._id === order.user && (
                     <ListGroup.Item>
                       <Row>{<CheckoutFormScreen order={order} />}</Row>
+                    </ListGroup.Item>
+                  )}
+
+                {userInfo &&
+                  userInfo.isAdmin &&
+                  order.isPaid &&
+                  !order.isDelivered && (
+                    <ListGroup.Item>
+                      {loadingDeliver && <Loader />}
+                      <div className="d-grid">
+                        <Button type="button" onClick={deliverOrderHandler}>
+                          Deliver Order
+                        </Button>
+                      </div>
                     </ListGroup.Item>
                   )}
               </ListGroup>

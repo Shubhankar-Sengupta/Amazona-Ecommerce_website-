@@ -7,6 +7,46 @@ import { isAuth, isAdmin } from '../utils.js';
 
 const orderRouter = express.Router();
 
+// payment result: order
+
+orderRouter.put(
+  '/:id/deliver',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const order = await Order.findById(id);
+
+    if (order) {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+      await order.save();
+      res.send({ message: 'Order Delivered' });
+    } else {
+      res.status(404).send({ message: 'Order not found' });
+    }
+  })
+);
+
+orderRouter.post(
+  '/pay',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const { orderID, payment } = req.body;
+    const orderDetails = await Order.findById(orderID);
+    const userDetails = await User.findById(orderDetails.user);
+
+    orderDetails.paymentResult.id = payment.id;
+    orderDetails.paymentResult.status = payment.status;
+    orderDetails.paymentResult.email_address = userDetails.email;
+    orderDetails.paymentResult.update_time = new Date(Number(payment.created));
+    orderDetails.isPaid = true;
+    orderDetails.paidAt = Date.now();
+
+    await orderDetails.save();
+    res.send(orderDetails);
+  })
+);
+
 orderRouter.get(
   '/',
   isAuth,

@@ -231,7 +231,7 @@
     3. fetch and display users
 
 
-44. Deliver Order & Checkout Pay Enhancement (Payment Improved)
+44. Deliver Order & Checkout Pay Enhancement (Payment Improved)-Second Commit
     1. add deliver button
     2. handle click action
     3. implement backen api for deliver
