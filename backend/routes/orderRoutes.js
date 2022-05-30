@@ -7,8 +7,20 @@ import { isAuth, isAdmin } from '../utils.js';
 
 const orderRouter = express.Router();
 
-// payment result: order
+// delete order
 
+orderRouter.delete(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const result = await Order.findByIdAndDelete(id);
+    res.send(`Order Deleted ${result}`);
+  })
+);
+
+// payment result: order
 orderRouter.put(
   '/:id/deliver',
   isAuth,
