@@ -235,3 +235,5 @@
     1. add deliver button
     2. handle click action
     3. implement backen api for deliver
+
+45. Little Enhancement on Checkout Screen (Some Code CleanUp)

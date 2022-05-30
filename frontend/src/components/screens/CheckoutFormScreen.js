@@ -74,7 +74,9 @@ function CheckoutFormScreen(props) {
     setProcessing(true);
 
     dispatch({ type: 'Pay_Request_Order' });
-    const payload = await stripe.confirmCardPayment(clientSecret, {
+
+    // finalise the card payment using the payment intent and the client secret associated with it.
+    await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
@@ -85,22 +87,30 @@ function CheckoutFormScreen(props) {
       },
     });
 
-    if (payload.paymentIntent && payload.paymentIntent.status === 'succeeded') {
-      dispatch({ type: 'Pay_Success_Order', payload: payload.paymentIntent });
-    }
 
-    if (payload.error) {
-      dispatch({
-        type: 'Pay_Fail_Order',
-        payload: getError(payload.error),
-      });
-      setError(`Payment failed ${payload.error.message}`);
-      setProcessing(false);
-    } else {
+    // retrieve the payment intent and confirm payment status.
+    const { paymentIntent, error } = await stripe.retrievePaymentIntent(
+      clientSecret
+    );
+
+    if (paymentIntent && paymentIntent.status === 'succeeded') {
+      dispatch({ type: 'Pay_Success_Order', payload: paymentIntent });
       setError(null);
       setProcessing(false);
       setSucceeded(true);
+    } else if (paymentIntent.last_payment_error || error) {
+      dispatch({
+        type: 'Pay_Fail_Order',
+        payload: getError(paymentIntent.last_payment_error || error),
+      });
+      setError(
+        `Payment failed ${
+          paymentIntent.last_payment_error.message || error.message
+        }`
+      );
+      setProcessing(false);
     }
+
   };
 
   return (

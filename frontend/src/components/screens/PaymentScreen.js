@@ -26,6 +26,10 @@ function PaymentScreen() {
     navigate('/placeorder');
   };
 
+  function checkProceed() {
+    toast.dismiss();
+  }
+
   // once the component has mounted then it will run.
   useEffect(() => {
     if (!shippingAddress.address) {
@@ -67,7 +71,7 @@ function PaymentScreen() {
           />
 
           <div className="my-3">
-            <Button variant="primary" type="submit">
+            <Button variant="primary" type="submit" onClick={checkProceed}>
               Proceed
             </Button>
           </div>
