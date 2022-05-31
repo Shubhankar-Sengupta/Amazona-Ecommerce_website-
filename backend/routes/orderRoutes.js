@@ -15,8 +15,14 @@ orderRouter.delete(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const result = await Order.findByIdAndDelete(id);
-    res.send(`Order Deleted ${result}`);
+    const order = await Order.findById(id);
+
+    if (order) {
+      await order.remove();
+      return res.send('Order removed successfully');
+    }
+
+    res.status(404).send(`Order not found`);
   })
 );
 

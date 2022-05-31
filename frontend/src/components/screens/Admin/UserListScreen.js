@@ -1,10 +1,12 @@
 import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
-import Spinner from 'react-bootstrap/esm/Spinner';
+import Spinner from 'react-bootstrap/Spinner';
 import { Helmet } from 'react-helmet-async';
 import { Store } from '../../../Store';
 import Message from '../../main_components/Message';
 import { getError } from '../../main_components/utils';
+import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -37,6 +39,8 @@ function UserListScreen() {
   const { state } = useContext(Store);
 
   const { userInfo } = state;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -85,7 +89,16 @@ function UserListScreen() {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.isAdmin ? 'Yes' : 'No'}</td>
-                  <td></td>
+                  <td>
+                    <Button
+                      variant="light"
+                      onClick={() => {
+                        navigate(`/admin/user/${user._id}`);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>

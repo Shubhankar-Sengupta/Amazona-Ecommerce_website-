@@ -242,3 +242,11 @@
     1. add delete button
     2. handle click action
     3. implement backen api for delete
+
+
+47. Edit User
+    1. create edit button
+    2. create edit product ui
+    3. dispaly product info in the input boxes
+    4. implement backend api
+    5. handle edit click
