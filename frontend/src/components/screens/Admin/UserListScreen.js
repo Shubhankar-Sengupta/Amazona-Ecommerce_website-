@@ -7,6 +7,7 @@ import Message from '../../main_components/Message';
 import { getError } from '../../main_components/utils';
 import Button from 'react-bootstrap/Button';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -27,14 +28,44 @@ const reducer = (state, action) => {
         ...state,
         loading: false,
       };
+    case 'Delete_Request':
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case 'Delete_Success':
+      return {
+        ...state,
+        loading: false,
+        successDelete: true,
+      };
+    case 'Delete_Fail':
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+        successDelete: false,
+      };
+
+    case 'Delete_Reset':
+      return {
+        ...state,
+        loading: false,
+        error: '',
+        successDelete: false,
+      };
   }
 };
 
 function UserListScreen() {
-  const [{ loading, error, users }, dispatch] = useReducer(reducer, {
-    loading: true,
-    error: '',
-  });
+  const [{ loading, error, users, successDelete }, dispatch] = useReducer(
+    reducer,
+    {
+      loading: true,
+      error: '',
+    }
+  );
 
   const { state } = useContext(Store);
 
@@ -56,8 +87,28 @@ function UserListScreen() {
       }
     };
 
-    fetchUsers();
-  }, [userInfo]); // when userInfo changes component useEffect will re-run
+    if (successDelete) {
+      dispatch({ type: 'Delete_Reset' });
+    } else {
+      fetchUsers();
+    }
+  }, [userInfo, successDelete]); // when userInfo changes component useEffect will re-run
+
+  const deleteHandler = async (user) => {
+    try {
+      if (window.confirm('Are you sure you want to delete?')) {
+        dispatch({ type: 'Delete_Request' });
+        await axios.delete(`/api/users/${user._id}`, {
+          headers: { authorization: `Bearer ${userInfo.token}` },
+        });
+        dispatch({ type: 'Delete_Success' });
+        toast.success('Deleted user successfully');
+      }
+    } catch (err) {
+      dispatch({ type: 'Delete_Fail', payload: getError(err) });
+      toast.error(getError(err));
+    }
+  };
 
   return (
     <div>
@@ -97,6 +148,15 @@ function UserListScreen() {
                       }}
                     >
                       Edit
+                    </Button>
+                    &nbsp;
+                    <Button
+                      variant="light"
+                      onClick={() => {
+                        deleteHandler(user);
+                      }}
+                    >
+                      Delete
                     </Button>
                   </td>
                 </tr>
