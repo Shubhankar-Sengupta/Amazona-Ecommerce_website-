@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 function ShippingScreen() {
   const navigate = useNavigate();
 
-  const { state, dispatch: ctxDispatch } = useContext(Store);
+  const { fullBox, state, dispatch: ctxDispatch } = useContext(Store);
 
   const {
     cart: { shippingAddress },
@@ -43,6 +43,7 @@ function ShippingScreen() {
         city,
         postalCode,
         country,
+        location: shippingAddress.location,
       },
     });
 
@@ -54,12 +55,17 @@ function ShippingScreen() {
         city,
         postalCode,
         country,
+        location: shippingAddress.location,
       })
     );
 
     navigate('/payment');
     toast.info('PayPal disabled for the moment.');
   };
+
+  useEffect(() => {
+    ctxDispatch({ type: 'Set_FullBox_Off' });
+  }, [ctxDispatch, fullBox]);
 
   return (
     <>
@@ -130,6 +136,28 @@ function ShippingScreen() {
               required
             ></Form.Control>
           </Form.Group>
+
+          <div className="mb-3">
+            <Button
+              id="chooseOnMap"
+              type="button"
+              variant="light"
+              onClick={() => {
+                navigate('/map');
+              }}
+            >
+              Choose Location on Map
+            </Button>
+
+            {shippingAddress.location && shippingAddress.location.lat ? (
+              <div className="mt-3">
+                LAT: {shippingAddress.location.lat} LNG:{' '}
+                {shippingAddress.location.lng}
+              </div>
+            ) : (
+              <div className="mt-3">No Location Found</div>
+            )}
+          </div>
 
           <div className="mb-3">
             <Button variant="primary" type="submit">

@@ -92,7 +92,6 @@ main {
   left: 0;
 }
 
-
 .checkout-form {
   width: 30vw;
   align-self: center;
@@ -100,8 +99,6 @@ main {
     0px 2px 5px 0px rgba(50, 50, 93, 0.1), 0px 1px 1.5px 0px rgba(0, 0, 0, 0.07);
   border-radius: 7px;
 }
-
-
 
 .result-message {
   line-height: 22px;
@@ -172,7 +169,7 @@ button:disabled {
 .spinner:before,
 .spinner:after {
   position: absolute;
-  content: "";
+  content: '';
 }
 
 .spinner:before {
@@ -212,5 +209,48 @@ button:disabled {
   }
 }
 
+/*Map*/
+
+.fullBox {
+  height: 100vh;
+  max-width: initial;
+}
+
+.fullBox header,
+.fullBox footer {
+  display: none;
+}
+
+.fullBox .container {
+  height: 100vh;
+  max-width: initial;
+  margin: 0;
+  padding: 0;
+}
 
 
+.fullBox .mt-3 {
+  margin-top: 0 !important;
+}
+
+
+.map-input-box {
+  box-sizing: border-box;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: 0.5rem auto;
+  width: 25rem;
+  height: 3rem;
+  display: flex;
+}
+
+.map-input-box input {
+  border-radius: 1rem 0 0 1rem;
+  border-right: 0;
+}
+
+.map-input-box button {
+  border-radius: 0 1rem 1rem 0;
+  border-left: 0;
+}

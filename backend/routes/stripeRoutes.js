@@ -33,7 +33,7 @@ stripeRouter.post(
 
     // Create a PaymentIntent with the order amount and currency
     const paymentIntent = await Stripe.paymentIntents.create({
-      amount: await calculateOrderItems(order),
+      amount: (await calculateOrderItems(order)) * 100,
       currency: 'INR',
       automatic_payment_methods: {
         enabled: true,

@@ -7,6 +7,8 @@ import logger from 'use-reducer-logger';
 export const Store = createContext();
 
 const initialState = {
+  fullBox: false,
+
   userInfo: localStorage.getItem('userInfo')
     ? JSON.parse(localStorage.getItem('userInfo'))
     : null,
@@ -20,7 +22,7 @@ const initialState = {
       : 'Stripe',
     shippingAddress: localStorage.getItem('shippingAddress')
       ? JSON.parse(localStorage.getItem('shippingAddress'))
-      : {},
+      : { location: {} },
   },
 
   // special case for Order screen.
@@ -99,6 +101,19 @@ function reducer(state, action) {
       };
     }
 
+    case 'Save_Shipping_Address_Map_Location': {
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          shippingAddress: {
+            ...state.cart.shippingAddress,
+            location: action.payload,
+          },
+        },
+      };
+    }
+
     case 'Save_Payment_method': {
       return {
         ...state,
@@ -143,6 +158,13 @@ function reducer(state, action) {
 
     case 'Pay_Reset_Order': {
       return { ...state, successPay: false, loadingPay: false, error: '' };
+    }
+
+    case 'Set_FullBox_On': {
+      return { ...state, fullBox: true };
+    }
+    case 'Set_FullBox_Off': {
+      return { ...state, fullBox: false };
     }
 
     default:

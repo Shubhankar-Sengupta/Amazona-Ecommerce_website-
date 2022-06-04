@@ -34,10 +34,11 @@ import ProductEditScreen from './components/screens/Admin/ProductEditScreen.js';
 import OrderListScreen from './components/screens/Admin/OrderListScreen.js';
 import UserListScreen from './components/screens/Admin/UserListScreen.js';
 import UserEditScreen from './components/screens/Admin/UserEditScreen.js';
+import MapScreen from './components/screens/MapScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
-  const { cart, userInfo } = state;
+  const { fullBox, cart, userInfo } = state;
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categories, setCategories] = useState([]);
@@ -73,7 +74,11 @@ function App() {
       <div
         className={
           sidebarOpen
-            ? 'd-flex flex-column site-container active-cont'
+            ? fullBox
+              ? 'd-flex flex-column site-container active-cont fullBox'
+              : 'd-flex flex-column site-container active-cont'
+            : fullBox
+            ? 'd-flex flex-column site-container fullBox'
             : 'd-flex flex-column site-container'
         }
       >
@@ -210,6 +215,7 @@ function App() {
               <Route path="/profile" element={<UserProfileScreen />} />
               <Route path="/checkoutsuccess" element={<CheckoutSuccess />} />
               <Route path="/search" element={<SearchScreen />} />
+              <Route path="/map" element={<MapScreen />} />
               <Route path="*" element={<NotFound />} />
 
               {/**Admin Routes */}
