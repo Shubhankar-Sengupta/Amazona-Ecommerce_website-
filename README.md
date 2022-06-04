@@ -269,3 +269,5 @@
     7. install @react-google-maps/api
     8. use it in shipping screen
     9. apply map to the checkout screen
+
+50. Quick Google Map fix

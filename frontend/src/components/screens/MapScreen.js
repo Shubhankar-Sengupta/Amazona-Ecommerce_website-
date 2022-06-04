@@ -1,25 +1,16 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Store } from '../../Store';
-import axios from 'axios';
-import {
-  LoadScript,
-  GoogleMap,
-  StandaloneSearchBox,
-  Marker,
-} from '@react-google-maps/api';
+import { GoogleMap, StandaloneSearchBox, Marker } from '@react-google-maps/api';
 import Button from 'react-bootstrap/Button';
 import { toast } from 'react-toastify';
 
 const defaultLocation = { lat: 45.516, lng: -73.56 };
 
-const libs = ['places'];
-
 function MapScreen() {
   const { state, dispatch: cxtDispatch } = useContext(Store);
 
   const navigate = useNavigate();
-  const [googleApiKey, setGoogleApiKey] = useState('');
   const [center, setCenter] = useState(defaultLocation);
   const [location, setLocation] = useState(center);
 
@@ -96,52 +87,41 @@ function MapScreen() {
 
   // once component is mounted/registered this runs
   useEffect(() => {
-    const fetchKey = async () => {
-      const { data } = await axios('/api/keys/google', {
-        headers: { authorization: `Bearer ${userInfo.token}` },
-      });
-
-      setGoogleApiKey(data.key);
-      getUserLocation();
-    };
-
-    fetchKey();
-
     cxtDispatch({ type: 'Set_FullBox_On' });
 
     if (!userInfo) {
       navigate('/signin');
     }
+
+    getUserLocation();
   }, [userInfo, cxtDispatch]);
 
   return (
     <div className="fullBox">
-      <LoadScript libraries={libs} googleMapsApiKey={googleApiKey}>
-        <GoogleMap
-          onLoad={onLoad}
-          onIdle={onIdle}
-          center={center}
-          mapContainerStyle={{ height: '100%', width: '100%' }}
-          zoom={15}
+      <GoogleMap
+        onLoad={onLoad}
+        onIdle={onIdle}
+        center={center}
+        mapContainerStyle={{ height: '100%', width: '100%' }}
+        zoom={15}
+      >
+        <StandaloneSearchBox
+          onLoad={onLoadPlaces}
+          onPlacesChanged={onPlacesChanged}
         >
-          <StandaloneSearchBox
-            onLoad={onLoadPlaces}
-            onPlacesChanged={onPlacesChanged}
-          >
-            <>
-              {' '}
-              <div className="map-input-box">
-                <input type="text" placeholder="Enter your address" />
-                <Button type="button" onClick={onConfirm}>
-                  Confirm
-                </Button>
-              </div>
-            </>
-          </StandaloneSearchBox>
+          <>
+            {' '}
+            <div className="map-input-box">
+              <input type="text" placeholder="Enter your address" />
+              <Button type="button" onClick={onConfirm}>
+                Confirm
+              </Button>
+            </div>
+          </>
+        </StandaloneSearchBox>
 
-          <Marker position={location} onLoad={onMarkerLoad}></Marker>
-        </GoogleMap>
-      </LoadScript>
+        <Marker position={location} onLoad={onMarkerLoad}></Marker>
+      </GoogleMap>
     </div>
   );
 }

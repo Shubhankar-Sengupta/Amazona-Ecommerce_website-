@@ -9,8 +9,6 @@ import path from 'path';
 import stripeRouter from './routes/stripeRoutes.js';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import uploadRouter from './routes/uploadRoutes.js';
-import cors from 'cors';
-import { isAuth } from './utils.js';
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();
@@ -26,8 +24,6 @@ mongoose
   });
 
 const app = express();
-
-app.use(cors({ origin: true }));
 
 app.use(ExpressMongoSanitize());
 
@@ -46,11 +42,6 @@ app.use('/api/users', userRouter);
 app.use('/api/stripe', stripeRouter);
 
 app.use('/api/upload', uploadRouter);
-
-// api key for google maps.
-app.get('/api/keys/google', isAuth, (req, res) => {
-  res.send({ key: process.env.GOOGLE_API_KEY || '' });
-});
 
 const __dirname = path.resolve();
 
