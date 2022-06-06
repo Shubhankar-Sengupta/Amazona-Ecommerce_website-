@@ -10,6 +10,7 @@ import { Store } from '../../../Store';
 import Loader from '../../main_components/Loader';
 import Message from '../../main_components/Message';
 import { getError } from '../../main_components/utils';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -96,13 +97,13 @@ function ProductEditScreen() {
     fetchData();
   }, [productId]); // this side effect runs conditionally when productId changes
 
-  const [{ loading, error, product, loadingUpdate, loadingUpload }, dispatch] =
+  const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
     useReducer(reducer, {
       loading: true,
       error: '',
     });
 
-  const fileUploader = async (e) => {
+  const fileUploader = async (e, multiFiles) => {
     const file = e.target.files[0]; // getting the first file from the e.target.files Nodelist
     const formData = new FormData();
     formData.append('file', file);
@@ -115,10 +116,17 @@ function ProductEditScreen() {
           authorization: `Bearer ${userInfo.token}`,
         },
       });
-      console.log(data);
+
       dispatch({ type: 'Upload_Success' });
-      toast.success('Image Uploaded successfully');
-      setImage(data.secure_url);
+
+      if (multiFiles) {
+        setImages([...images, data.secure_url]);
+      } else {
+        setImage(data.secure_url);
+      }
+      toast.success(
+        'Image Uploaded successfully. Click on update to apply it.'
+      );
     } catch (err) {
       dispatch({ type: 'Upload_Fail', payload: err });
       toast.error(getError(err));
@@ -138,6 +146,7 @@ function ProductEditScreen() {
           slug,
           category,
           image,
+          images,
           price,
           countInStock,
           brand,
@@ -161,12 +170,20 @@ function ProductEditScreen() {
   const [slug, setSlug] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState('');
+  const [images, setImages] = useState([]);
+
   const [price, setPrice] = useState('');
   const [countInStock, setCountInStock] = useState('');
   const [brand, setBrand] = useState('');
   const [rating, setRating] = useState('');
   const [numReviews, setNumReviews] = useState('');
   const [description, setDescription] = useState('');
+
+  const deleteHandler = (filename) => {
+    // filter the images which are deleted.
+    setImages(images.filter((x) => x !== filename));
+    toast.success('Image deleted successfully. Click on update to apply it.');
+  };
 
   return (
     <Container className="container small-container">
@@ -216,6 +233,37 @@ function ProductEditScreen() {
                 setImage(e.target.value);
               }}
             ></Form.Control>
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="addtionalFiles">
+            {images.length === 0 && (
+              <Message variant="warning">
+                No Additional Images To Upload
+              </Message>
+            )}
+
+            <ListGroup variant="flush">
+              {images.map((x) => (
+                <ListGroup.Item key={x}>
+                  {x}
+                  <Button
+                    variant="light"
+                    onClick={() => {
+                      deleteHandler(x);
+                    }}
+                  >
+                    <i className="fa fa-times-circle"></i>
+                  </Button>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+
+            <ListGroup variant="flush">Upload Additional Images</ListGroup>
+            <Form.Control
+              type="file"
+              onChange={() => fileUploader(e, true)}
+            ></Form.Control>
+            {loadingUpload && <Loader />}
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="imageFile">

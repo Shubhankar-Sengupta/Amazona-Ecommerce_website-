@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { toast } from 'react-toastify';
+import Card from 'react-bootstrap/Card';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -64,6 +65,9 @@ function ProductScreen() {
 
   const [comment, setComment] = useState('');
   const [rating, setRating] = useState(0);
+
+  // the current selected image.
+  const [selectedImage, setSelectedImage] = useState('');
 
   const navigate = useNavigate();
   const params = useParams();
@@ -177,7 +181,7 @@ function ProductScreen() {
             <Col md={6}>
               <img
                 className="img-large"
-                src={product.image}
+                src={selectedImage || product.image}
                 alt={product.name}
               />
             </Col>
@@ -199,6 +203,31 @@ function ProductScreen() {
 
                 <ListGroup.Item>
                   <p>{product.description}</p>
+                </ListGroup.Item>
+
+                <ListGroup.Item>
+                  <Row xs={1} md={2} className="g-2">
+                    {[product.image, ...product.images].map((image) => (
+                      <Col key={image}>
+                        <Card>
+                          <Button
+                            className="thumbnail"
+                            type="button"
+                            variant="light"
+                            onClick={() => {
+                              setSelectedImage(image);
+                            }}
+                          >
+                            <Card.Img
+                              variant="top"
+                              src={image}
+                              alt="product"
+                            ></Card.Img>
+                          </Button>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
                 </ListGroup.Item>
               </ListGroup>
             </Col>

@@ -26,6 +26,7 @@ productsRoutes.put(
       slug,
       category,
       image,
+      images,
       price,
       countInStock,
       brand,
@@ -41,6 +42,7 @@ productsRoutes.put(
       checkProduct.slug = slug;
       checkProduct.category = category;
       checkProduct.image = image;
+      checkProduct.images = images;
       checkProduct.price = price;
       checkProduct.countInStock = countInStock;
       checkProduct.brand = brand;

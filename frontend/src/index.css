@@ -228,11 +228,9 @@ button:disabled {
   padding: 0;
 }
 
-
 .fullBox .mt-3 {
   margin-top: 0 !important;
 }
-
 
 .map-input-box {
   box-sizing: border-box;
@@ -253,4 +251,8 @@ button:disabled {
 .map-input-box button {
   border-radius: 0 1rem 1rem 0;
   border-left: 0;
+}
+
+button.thumbnail {
+  padding: 0;
 }
