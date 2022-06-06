@@ -261,7 +261,7 @@ function ProductEditScreen() {
             <ListGroup variant="flush">Upload Additional Images</ListGroup>
             <Form.Control
               type="file"
-              onChange={() => fileUploader(e, true)}
+              onChange={(e) => fileUploader(e, true)}
             ></Form.Control>
             {loadingUpload && <Loader />}
           </Form.Group>
