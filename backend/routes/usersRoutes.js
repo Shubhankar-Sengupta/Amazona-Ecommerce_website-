@@ -82,7 +82,7 @@ userRouter.put(
   isAdmin,
   expressAsyncHandler(async (req, res) => {
     const { id } = req.params;
-    const { name, email, isAdmin } = req.body;
+    const { name, email, isAdmin, isSeller } = req.body;
 
     const user = await User.findById(id);
 
@@ -90,6 +90,7 @@ userRouter.put(
       user.name = name || user.name;
       user.email = email || user.email;
       user.isAdmin = Boolean(isAdmin);
+      user.isSeller = Boolean(isSeller);
       const updatedUser = await user.save();
       res.send({ message: 'User Updated', user: updatedUser });
     } else {

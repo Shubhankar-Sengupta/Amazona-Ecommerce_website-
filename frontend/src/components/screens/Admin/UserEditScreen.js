@@ -43,6 +43,7 @@ function UserEditScreen() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isAdmin, setAdmin] = useState(false);
+  const [isSeller, setSeller] = useState(false);
 
   const navigate = useNavigate();
 
@@ -66,6 +67,7 @@ function UserEditScreen() {
         setName(data.name);
         setEmail(data.email);
         setAdmin(data.isAdmin);
+        setSeller(data.isSeller);
       } catch (err) {
         dispatch({ type: 'Fetch_Fail', payload: getError(err) });
       }
@@ -81,7 +83,7 @@ function UserEditScreen() {
       dispatch({ type: 'Update_Request' });
       const { data } = await axios.put(
         `/api/users/${userId}`,
-        { _id: userId, name, email, isAdmin },
+        { _id: userId, name, email, isAdmin, isSeller },
         { headers: { authorization: `Bearer ${userInfo.token}` } }
       );
 
@@ -133,6 +135,15 @@ function UserEditScreen() {
               required
             ></Form.Control>
           </Form.Group>
+
+          <Form.Check
+            className="mb-3"
+            type="checkbox"
+            id="isSeller"
+            label="isSeller"
+            checked={isSeller}
+            onChange={(e) => setSeller(e.target.checked)}
+          ></Form.Check>
 
           <Form.Check
             className="mb-3"
