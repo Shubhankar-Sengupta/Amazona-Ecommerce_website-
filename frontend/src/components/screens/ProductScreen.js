@@ -1,5 +1,11 @@
-import React, { useContext, useReducer, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, {
+  useContext,
+  useReducer,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -13,6 +19,9 @@ import Message from '../main_components/Message';
 import { getError } from '../main_components/utils';
 import { Store } from '../../Store';
 import { useNavigate } from 'react-router-dom';
+import Form from 'react-bootstrap/Form';
+import FloatingLabel from 'react-bootstrap/FloatingLabel';
+import { toast } from 'react-toastify';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -34,21 +43,38 @@ function reducer(state, action) {
         loading: false,
         error: action.payload,
       };
+
+    case 'Create_Request':
+      return { ...state, loadingCreateReview: true };
+    case 'Create_Success':
+      return { ...state, loadingCreateReview: false };
+    case 'Create_Fail':
+      return { ...state, loadingCreateReview: false };
+
+    case 'Refresh_Product':
+      return { ...state, product: action.payload };
+
     default:
       return state;
   }
 }
 
 function ProductScreen() {
+  let reviewsRef = useRef();
+
+  const [comment, setComment] = useState('');
+  const [rating, setRating] = useState(0);
+
+  const navigate = useNavigate();
   const params = useParams();
   const { slug } = params;
-  const navigate = useNavigate();
 
-  const [{ loading, error, product }, dispatch] = useReducer(reducer, {
-    product: [],
-    loading: true,
-    error: '',
-  });
+  const [{ loading, error, product, loadingCreateReview }, dispatch] =
+    useReducer(reducer, {
+      product: [],
+      loading: true,
+      error: '',
+    });
 
   // here second dispatch renamed for clarity purposes.
   const {
@@ -77,6 +103,40 @@ function ProductScreen() {
     });
 
     navigate('/cart');
+  };
+
+  const onSubmitHandler = async (e) => {
+    e.preventDefault();
+
+    if (!comment || !rating) {
+      toast.error('Comment or rating missing');
+      return;
+    }
+
+    try {
+      dispatch({ type: 'Create_Request' });
+      const { data } = await axios.post(
+        `/api/products/${product._id}/reviews`,
+        { rating, comment, name: userInfo.name },
+        { headers: { authorization: `Bearer ${userInfo.token}` } }
+      );
+
+      dispatch({ type: 'Create_Success' });
+      toast.success('Review submitted successfully');
+
+      product.reviews.unshift(data.review);
+      product.numReviews = data.numReviews;
+      product.rating = data.rating;
+
+      dispatch({ type: 'Refresh_Product', payload: product });
+      window.scrollTo({
+        behavior: 'smooth',
+        top: reviewsRef.current.offsetTop,
+      });
+    } catch (err) {
+      toast.error(getError(error));
+      dispatch({ type: 'Create_Fail' });
+    }
   };
 
   // repilcating componentDidMount(). Used for running side effects();
@@ -179,6 +239,75 @@ function ProductScreen() {
               </ListGroup>
             </Col>
           </Row>
+
+          <div className="my-3">
+            <h2 ref={reviewsRef}>Reviews</h2>
+            <div>
+              {product.reviews.length === 0 && <Message>No reviews</Message>}
+            </div>
+
+            <ListGroup>
+              {product.reviews.map((review) => (
+                <ListGroup.Item key={review._id}>
+                  <strong>{review.name}</strong>
+                  <Rating rating={review.rating} caption=""></Rating>
+                  <p>{review.createdAt.substring(0, 10)}</p>
+                  <p>{review.comment}</p>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
+
+            <div className="mb-3">
+              {userInfo ? (
+                <Form onSubmit={onSubmitHandler}>
+                  <h4>Write a customer review</h4>
+
+                  <Form.Group className="mb-3" controlId="rating">
+                    <Form.Label>Rating</Form.Label>
+                    <Form.Select
+                      value={rating}
+                      onChange={(e) => setRating(e.target.value)}
+                    >
+                      <option value="">Select...</option>
+                      <option value="1">1- Poor</option>
+                      <option value="2">2- Fair</option>
+                      <option value="3">3- Good</option>
+                      <option value="4">4- Very Good</option>
+                      <option value="5">5- Excellent</option>
+                    </Form.Select>
+                  </Form.Group>
+
+                  <FloatingLabel
+                    controlId="floatingTextarea"
+                    label="Comments"
+                    className="mb-3"
+                  >
+                    <Form.Control
+                      type="textarea"
+                      placeholder="Leave a comment here"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                    ></Form.Control>
+                  </FloatingLabel>
+
+                  <div className="mb-3">
+                    <Button type="submit" disabled={loadingCreateReview}>
+                      Submit
+                    </Button>
+
+                    {loadingCreateReview && <Loader />}
+                  </div>
+                </Form>
+              ) : (
+                <Message variant="warning">
+                  Please{' '}
+                  <Link to={`/signin?redirect=/product/${product.slug}`}>
+                    SignIn
+                  </Link>
+                </Message>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </>
