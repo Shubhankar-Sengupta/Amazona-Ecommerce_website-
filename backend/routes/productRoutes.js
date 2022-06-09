@@ -1,13 +1,34 @@
 import express from 'express';
 import Product from '../models/Product.js';
 import expressAsyncHandler from 'express-async-handler';
-import { isAdmin, isAuth } from '../utils.js';
+import { isAdmin, isAuth, isSellerOrAdmin } from '../utils.js';
 const productsRoutes = express.Router();
 
 productsRoutes.get('/', async (req, res) => {
-  const products = await Product.find({});
+  // filter products only those that seller owns and operates.
+
+  const seller = req.query.seller || '';
+  const searchFilter = seller ? { seller } : {};
+  const { page } = req.query;
+  const pageSize = 2;
+  const products = await Product.find({ ...searchFilter });
+
+  if (page) {
+    const products = await Product.find({ ...searchFilter })
+      .skip(pageSize * (page - 1))
+      .limit(pageSize);
+
+    const countProducts = await Product.countDocuments({ ...searchFilter });
+
+    return res.send({
+      products,
+      page,
+      pages: Math.ceil(countProducts / pageSize),
+    });
+  }
+
   if (products) {
-    res.send(products);
+    res.send({ products });
   } else {
     res.status(404).send({
       message: 'No Products to display',
@@ -18,7 +39,7 @@ productsRoutes.get('/', async (req, res) => {
 productsRoutes.put(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const id = req.params.id;
     const {
@@ -65,7 +86,7 @@ productsRoutes.put(
 productsRoutes.delete(
   '/:id',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const id = req.params.id;
     const product = await Product.findById(id);
@@ -82,10 +103,11 @@ productsRoutes.delete(
 productsRoutes.post(
   '/',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
     const newProduct = await Product.create({
       name: 'sample name ' + Date.now(),
+      seller: req.user._id,
       slug: 'sample-slug- ' + Date.now(),
       category: 'Unknown',
       image: '/images/p2.jpg',
@@ -192,6 +214,8 @@ productsRoutes.get(
           };
 
     // filter end
+
+    // methods to execute.
 
     const products = await Product.find({
       ...queryFilters,

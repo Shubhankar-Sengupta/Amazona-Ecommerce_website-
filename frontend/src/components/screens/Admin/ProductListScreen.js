@@ -99,7 +99,7 @@ function ProductListScreen() {
   const { state } = useContext(Store);
   const { userInfo } = state;
 
-  const { search } = useLocation();
+  const { search, pathname } = useLocation();
 
   const sp = new URLSearchParams(search);
 
@@ -108,12 +108,13 @@ function ProductListScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (api) => {
       try {
         dispatch({ type: 'Fetch_Request' });
-        const { data } = await axios.get(`/api/products/admin?page=${page}`, {
+        const { data } = await axios.get(api, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
+
         dispatch({ type: 'Fetch_Success', payload: data });
       } catch (err) {
         dispatch({ type: 'Fetch_Fail', payload: getError(err) });
@@ -123,7 +124,11 @@ function ProductListScreen() {
     if (successDelete) {
       dispatch({ type: 'Delete_Reset' });
     } else {
-      fetchData();
+      if (pathname.includes('/admin')) {
+        fetchData(`/api/products/admin?page=${page}`);
+      } else if (pathname.includes('/seller')) {
+        fetchData(`/api/products?seller=${userInfo._id}&page=${page}`);
+      }
     }
   }, [userInfo, page, successDelete]); // consitionally run the effect which re-renders the component.
 
@@ -136,7 +141,12 @@ function ProductListScreen() {
         });
         dispatch({ type: 'Delete_Success' });
         toast.success(data.message);
-        navigate(`/admin/products`);
+
+        if (pathname.includes('/admin')) {
+          navigate(`/admin/products`);
+        } else if (pathname.includes('/seller')) {
+          navigate(`/seller/productslist`);
+        }
       } else {
         toast.error('Deletion not initiated');
       }
@@ -161,8 +171,12 @@ function ProductListScreen() {
               headers: { authorization: `Bearer ${userInfo.token}` },
             }
           );
+
           dispatch({ type: 'Create_Success', payload: data });
-          navigate(`/admin/product/${data.product._id}`);
+
+          pathname.includes('/admin')
+            ? navigate(`/admin/product/${data.product._id}`)
+            : navigate(`/seller/productslist/${data.product._id}`);
         };
         createProduct();
       } catch (err) {
@@ -218,7 +232,9 @@ function ProductListScreen() {
                       className="mx-2"
                       variant="light"
                       onClick={() => {
-                        navigate(`/admin/product/${product._id}`);
+                        pathname.includes('/admin')
+                          ? navigate(`/admin/product/${product._id}`)
+                          : navigate(`/seller/productslist/${product._id}`);
                       }}
                     >
                       Edit
@@ -243,7 +259,11 @@ function ProductListScreen() {
               <Link
                 className={Number(page) === x + 1 ? 'btn text-bold' : 'btn'}
                 key={x + 1}
-                to={`/admin/products?page=${x + 1}`}
+                to={
+                  pathname.includes('/admin')
+                    ? `/admin/products?page=${x + 1}`
+                    : `/seller/productslist?page=${x + 1}`
+                }
               >
                 {x + 1}
               </Link>

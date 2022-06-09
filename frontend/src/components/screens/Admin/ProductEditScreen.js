@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Store } from '../../../Store';
 import Loader from '../../main_components/Loader';
@@ -71,6 +71,10 @@ function ProductEditScreen() {
 
   const { state } = useContext(Store);
   const { userInfo } = state;
+
+  const location = useLocation();
+
+  console.log(location.pathname.includes('seller'));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -159,7 +163,12 @@ function ProductEditScreen() {
 
       dispatch({ type: 'Update_Success' });
       toast.success('Data updated successfully');
-      navigate('/admin/products');
+
+      if (location.pathname.includes('/seller')) {
+        navigate(`/seller/productslist`);
+      } else {
+        navigate('/admin/products');
+      }
     } catch (err) {
       dispatch({ type: 'Update_Fail', payload: getError(err) });
       toast.error(getError(err));

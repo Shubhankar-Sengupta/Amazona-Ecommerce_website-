@@ -47,13 +47,20 @@ userRouter.put(
   '/profile',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
-    const { id } = req.user;
-    const user = await User.findOne({ id });
+    const { name, email, password, sellerName, sellerLogo, sellerDescription } =
+      req.body;
+    const id = req.user._id;
+    const user = await User.findById(id);
 
     if (user) {
       user.name = name || user.name;
       user.email = email || user.email;
+
+      if (user.isSeller) {
+        user.seller.name = sellerName || user.seller.name;
+        user.seller.logo = sellerLogo || user.seller.logo;
+        user.seller.description = sellerDescription || user.seller.description;
+      }
 
       // code stops here to execute.
       if (password) {
@@ -67,6 +74,8 @@ userRouter.put(
         name: updatedUser.name,
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,
+        isSeller: user.isSeller,
+        seller: user.isSeller ? user.seller : null,
         token: generateToken(updatedUser),
       });
     } else {
@@ -112,6 +121,8 @@ userRouter.post(
           name: user.name,
           email: user.email,
           isAdmin: user.isAdmin,
+          isSeller: user.isSeller,
+          seller: user.isSeller ? user.seller : null,
           token: generateToken(user),
         });
 
@@ -136,6 +147,7 @@ userRouter.post(
       password: bcyrpt.hashSync(password),
     });
 
+    // save the user.
     await user.save();
 
     // send it to the frontend of amazona
@@ -144,6 +156,8 @@ userRouter.post(
       name: user.name,
       email: user.email,
       isAdmin: user.isAdmin,
+      isSeller: user.isSeller,
+      seller: user.isSeller ? user.seller : null,
       token: generateToken(user),
     });
   })

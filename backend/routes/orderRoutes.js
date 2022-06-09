@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/order.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
-import { isAuth, isAdmin } from '../utils.js';
+import { isAuth, isAdmin, isSellerOrAdmin } from '../utils.js';
 
 const orderRouter = express.Router();
 
@@ -68,9 +68,16 @@ orderRouter.post(
 orderRouter.get(
   '/',
   isAuth,
-  isAdmin,
+  isSellerOrAdmin,
   expressAsyncHandler(async (req, res) => {
-    const order = await Order.find().populate({ path: 'user', select: 'name' });
+    const seller = req.query.seller || '';
+
+    const searchFilter = seller ? { seller } : {};
+    const order = await Order.find({ ...searchFilter }).populate({
+      path: 'user',
+      select: 'name',
+    });
+
     if (order) {
       res.send(order);
     } else {
@@ -125,7 +132,7 @@ orderRouter.get(
         $group: {
           _id: null,
           countOrders: { $sum: 1 },
-          totalSales: { $sum: '$totalSales' }, // based on the field of totalSales and returned as totalSales
+          totalSales: { $sum: '$totalPrice' }, // based on the field of totalSales and returned as totalSales
         },
       },
     ]);
@@ -137,7 +144,7 @@ orderRouter.get(
         $group: {
           _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
           orders: { $sum: 1 },
-          sales: { $sum: '$totalSales' }, // fields from which we take the aggregate.
+          sales: { $sum: '$totalPrice' }, // fields from which we take the aggregate.
         },
       },
 

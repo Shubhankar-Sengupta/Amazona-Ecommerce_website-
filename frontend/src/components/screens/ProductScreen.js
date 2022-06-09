@@ -277,7 +277,7 @@ function ProductScreen() {
 
             <ListGroup>
               {product.reviews.map((review) => (
-                <ListGroup.Item key={review._id}>
+                <ListGroup.Item className="mb-3" key={review._id}>
                   <strong>{review.name}</strong>
                   <Rating rating={review.rating} caption=""></Rating>
                   <p>{review.createdAt.substring(0, 10)}</p>

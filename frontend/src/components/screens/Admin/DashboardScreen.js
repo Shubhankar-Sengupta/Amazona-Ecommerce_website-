@@ -104,6 +104,7 @@ function DashboardScreen() {
               <Card>
                 <Card.Body>
                   <Card.Title>
+                  
                     {summary &&
                       summary.orders[0] &&
                       summary.orders[0].totalSales}
@@ -127,9 +128,9 @@ function DashboardScreen() {
                     chartType="AreaChart"
                     width="100%"
                     height="400px"
-                    loader={<div>Loading chart...</div>}
+                    loader={<div><Loader/></div>}
                     data={[
-                      ['Date', 'Orders'],
+                      ['Date', 'Sales'],
                       ...summary.dailyOrders.map((x) => [x._id, x.sales]),
                     ]}
                   />
@@ -146,7 +147,7 @@ function DashboardScreen() {
                   chartType="AreaChart"
                   width="100%"
                   height="400px"
-                  loader={<div>Loading chart...</div>}
+                  loader={<div><Loader/></div>}
                   data={[
                     ['Date', 'Orders'],
                     ...summary.dailyOrders.map((x) => [x._id, x.orders]),

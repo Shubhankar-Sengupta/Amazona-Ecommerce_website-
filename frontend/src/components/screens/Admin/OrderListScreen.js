@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useContext, useEffect, useReducer } from 'react';
 import Button from 'react-bootstrap/Button';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Store } from '../../../Store';
 import Loader from '../../main_components/Loader';
 import Message from '../../main_components/Message';
@@ -72,11 +72,13 @@ function OrderListScreen() {
 
   const navigate = useNavigate();
 
+  const { pathname } = useLocation();
+
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (query = '') => {
       try {
         dispatch({ type: 'Fetch_Request' });
-        const { data } = await axios.get('/api/orders', {
+        const { data } = await axios.get(`/api/orders?seller=${query}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
 
@@ -88,7 +90,9 @@ function OrderListScreen() {
     if (successDelete) {
       dispatch({ type: 'Delete_Reset' });
     } else {
-      fetchData();
+      if (pathname.includes('/seller')) {
+        fetchData(userInfo._id);
+      } else fetchData();
     }
   }, [userInfo, successDelete]);
 

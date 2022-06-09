@@ -21,7 +21,7 @@ function reducer(state, action) {
       return {
         ...state,
         loading: false,
-        products: action.payload,
+        products: action.payload.products,
       };
     case 'Fetch_Fail':
       return {

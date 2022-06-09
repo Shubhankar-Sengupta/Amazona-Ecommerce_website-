@@ -23,6 +23,8 @@ const productSchema = new mongoose.Schema(
       unique: true,
     },
 
+    seller: { type: mongoose.SchemaTypes.ObjectId, ref: 'User' },
+
     category: {
       type: String,
       required: true,

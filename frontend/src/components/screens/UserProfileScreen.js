@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Store } from '../../Store';
+import Loader from '../main_components/Loader';
 import { getError } from '../main_components/utils';
 
 const reducer = (state, action) => {
@@ -39,6 +40,17 @@ function UserProfileScreen() {
   const [cPassword, setCPassword] = useState('');
   const [button, setButton] = useState('Update');
 
+  // for sellers portion.
+  const [sellerName, setSellerName] = useState(
+    userInfo.isSeller ? userInfo.seller.name : ''
+  );
+  const [sellerLogo, setSellerLogo] = useState(
+    userInfo.isSeller ? userInfo.seller.logo : ''
+  );
+  const [sellerDescription, setSellerDescription] = useState(
+    userInfo.isSeller ? userInfo.seller.description : ''
+  );
+
   const [{ loadingUpdate }, dispatch] = useReducer(reducer, {
     loadingUpdate: false,
   });
@@ -57,7 +69,7 @@ function UserProfileScreen() {
 
       const { data } = await axios.put(
         '/api/users/profile',
-        { name, email, password },
+        { name, email, password, sellerName, sellerLogo, sellerDescription },
         {
           headers: {
             authorization: 'Bearer ' + userInfo.token,
@@ -77,6 +89,7 @@ function UserProfileScreen() {
     } catch (err) {
       dispatch({ type: 'Update_Fail' });
       toast.error(getError(err));
+      setButton('Update');
     }
   };
 
@@ -140,8 +153,45 @@ function UserProfileScreen() {
           />
         </Form.Group>
 
+        {userInfo && userInfo.isSeller && (
+          <>
+            <h2>Seller</h2>
+
+            <Form.Group className="mb-3" controlId="sellerName">
+              <Form.Label>Seller Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Seller name"
+                value={sellerName}
+                onChange={(e) => setSellerName(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="sellerLogo">
+              <Form.Label>Seller Logo</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Seller Logo"
+                value={sellerLogo}
+                onChange={(e) => setSellerLogo(e.target.value)}
+              />
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="sellerDescription">
+              <Form.Label>Seller Description</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Seller Description"
+                value={sellerDescription}
+                onChange={(e) => setSellerDescription(e.target.value)}
+              />
+            </Form.Group>
+          </>
+        )}
+
         <div className="mb-3">
           <Button type="submit">{button}</Button>
+          {loadingUpdate && <Loader />}
         </div>
       </Form>
     </div>

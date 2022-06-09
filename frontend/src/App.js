@@ -35,6 +35,7 @@ import OrderListScreen from './components/screens/Admin/OrderListScreen.js';
 import UserListScreen from './components/screens/Admin/UserListScreen.js';
 import UserEditScreen from './components/screens/Admin/UserEditScreen.js';
 import MapScreen from './components/screens/MapScreen.js';
+import SellerRouteMain from './components/screens/Seller/SellerRouteMain.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -94,10 +95,8 @@ function App() {
               <LinkContainer to="/">
                 <Navbar.Brand>amazona</Navbar.Brand>
               </LinkContainer>
-
               <ToastContainer position="top-center" limit={1} />
               <Navbar.Toggle aria-controls="basic-control-nav" />
-
               <Navbar.Collapse id="basic-control-nav">
                 <SearchBox />
                 <Nav className="me-auto w-100 justify-content-end">
@@ -145,6 +144,24 @@ function App() {
                     </Link>
                   )}
 
+                  {/*For Seller dropdowns*/}
+                  {userInfo && userInfo.isSeller && (
+                    <NavDropdown
+                      title="Seller"
+                      id="basic-nav-dropdown"
+                      className="nav-link"
+                    >
+                      <LinkContainer to="/seller/productslist">
+                        <NavDropdown.Item>Products</NavDropdown.Item>
+                      </LinkContainer>
+
+                      <LinkContainer to="/seller/orderslist">
+                        <NavDropdown.Item>Orders</NavDropdown.Item>
+                      </LinkContainer>
+                    </NavDropdown>
+                  )}
+
+                  {/*For Admin dropdowns*/}
                   {userInfo && userInfo.isAdmin && (
                     <NavDropdown
                       title="Admin"
@@ -268,6 +285,33 @@ function App() {
                   <AdminRouteMain>
                     <UserEditScreen />
                   </AdminRouteMain>
+                }
+              />
+
+              {/*Seller Route main*/}
+              <Route
+                path="/seller/productslist"
+                element={
+                  <SellerRouteMain>
+                    <ProductListScreen />
+                  </SellerRouteMain>
+                }
+              />
+              <Route
+                path="/seller/orderslist"
+                element={
+                  <SellerRouteMain>
+                    <OrderListScreen />
+                  </SellerRouteMain>
+                }
+              />
+
+              <Route
+                path="/seller/productslist/:id"
+                element={
+                  <SellerRouteMain>
+                    <ProductEditScreen />
+                  </SellerRouteMain>
                 }
               />
             </Routes>
