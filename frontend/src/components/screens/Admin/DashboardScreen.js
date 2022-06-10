@@ -104,7 +104,6 @@ function DashboardScreen() {
               <Card>
                 <Card.Body>
                   <Card.Title>
-                  
                     {summary &&
                       summary.orders[0] &&
                       summary.orders[0].totalSales}
@@ -119,8 +118,12 @@ function DashboardScreen() {
 
           <Row>
             <h2>Sales</h2>
-            {summary.dailyOrders[0].sales === 0 ? (
-             <Col><Message variant="warning">No Sales</Message></Col> 
+            {summary &&
+            summary.dailyOrders[0] &&
+            summary.dailyOrders[0].sales === 0 ? (
+              <Col>
+                <Message variant="warning">No Sales</Message>
+              </Col>
             ) : (
               <Col className="mb-3">
                 <Card>
@@ -128,7 +131,11 @@ function DashboardScreen() {
                     chartType="AreaChart"
                     width="100%"
                     height="400px"
-                    loader={<div><Loader/></div>}
+                    loader={
+                      <div>
+                        <Loader />
+                      </div>
+                    }
                     data={[
                       ['Date', 'Sales'],
                       ...summary.dailyOrders.map((x) => [x._id, x.sales]),
@@ -147,7 +154,11 @@ function DashboardScreen() {
                   chartType="AreaChart"
                   width="100%"
                   height="400px"
-                  loader={<div><Loader/></div>}
+                  loader={
+                    <div>
+                      <Loader />
+                    </div>
+                  }
                   data={[
                     ['Date', 'Orders'],
                     ...summary.dailyOrders.map((x) => [x._id, x.orders]),

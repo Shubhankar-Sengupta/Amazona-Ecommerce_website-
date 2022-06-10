@@ -102,6 +102,7 @@ orderRouter.post(
 
     const newOrder = new Order({
       orderItems: orderItems.map((x) => ({ ...x, product: x._id })),
+      seller: orderItems[0].seller,
       shippingAddress,
       paymentMethod,
       itemsPrice,

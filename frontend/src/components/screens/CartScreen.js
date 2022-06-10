@@ -27,6 +27,7 @@ function CartScreen() {
 
   const addToCartHandler = async (item, quantity) => {
     const { data } = await axios(`/api/products/${item._id}`);
+
     if (data.countInStock < quantity) {
       window.alert('Sorry. product is out of Stock');
       return;
@@ -34,7 +35,7 @@ function CartScreen() {
 
     ctxDispatch({
       type: 'Cart_Add_item',
-      payload: { ...item, quantity },
+      payload: { ...item, quantity, seller: data.seller },
     });
   };
 

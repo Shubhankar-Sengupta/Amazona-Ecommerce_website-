@@ -293,3 +293,6 @@
     3. list products for seller
     4. list orders for seller
     5. add Seller to Product List and Details Screen
+
+
+55. Quick order's seller update fix
