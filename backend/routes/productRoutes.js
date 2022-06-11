@@ -11,14 +11,20 @@ productsRoutes.get('/', async (req, res) => {
   const searchFilter = seller ? { seller } : {};
   const { page } = req.query;
   const pageSize = 2;
-  const products = await Product.find({ ...searchFilter });
+  const products = await Product.find({ ...searchFilter }).populate(
+    'seller',
+    'seller.name seller.logo'
+  );
 
   if (page) {
     const products = await Product.find({ ...searchFilter })
+      .populate('seller', 'seller.name seller.logo')
       .skip(pageSize * (page - 1))
       .limit(pageSize);
 
-    const countProducts = await Product.countDocuments({ ...searchFilter });
+    const countProducts = await Product.countDocuments({
+      ...searchFilter,
+    });
 
     return res.send({
       products,
@@ -269,7 +275,10 @@ productsRoutes.get(
 productsRoutes.get('/slug/:slug', async (req, res) => {
   const product = await Product.findOne({
     slug: req.params.slug,
-  });
+  }).populate(
+    'seller',
+    'seller.name seller.logo seller.rating seller.numReviews'
+  );
 
   if (product) {
     res.send(product);
@@ -281,7 +290,10 @@ productsRoutes.get('/slug/:slug', async (req, res) => {
 });
 
 productsRoutes.get('/:id', async (req, res) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate(
+    'seller',
+    'seller.name seller.logo seller.rating seller.numReviews'
+  );
 
   if (product) {
     res.send(product);

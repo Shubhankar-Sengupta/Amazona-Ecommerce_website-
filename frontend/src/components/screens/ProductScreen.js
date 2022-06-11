@@ -236,6 +236,32 @@ function ProductScreen() {
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <Row>
+                    <Col>
+                      {' '}
+                      <h6>
+                        Seller:{' '}
+                        {userInfo && userInfo.isSeller ? (
+                          <Link to={`/seller/${product.seller._id}`}>
+                            {product.seller.seller.name}
+                          </Link>
+                        ) : (
+                          `${product.seller.seller.name}`
+                        )}
+                      </h6>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col>
+                      <Rating
+                        numReviews={product.seller.seller.numReviews}
+                        rating={product.seller.seller.rating}
+                      />
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+
+                <ListGroup.Item>
+                  <Row>
                     <Col>Price:</Col>
                     <Col>${product.price}</Col>
                   </Row>

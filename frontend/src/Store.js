@@ -1,6 +1,7 @@
 // create a  context store to ue for global state.
 import { useReducer, createContext } from 'react';
 import logger from 'use-reducer-logger';
+import axios from 'axios';
 
 // this gives us a Context Object.
 export const Store = createContext();

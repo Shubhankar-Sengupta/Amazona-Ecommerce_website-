@@ -36,6 +36,7 @@ import UserListScreen from './components/screens/Admin/UserListScreen.js';
 import UserEditScreen from './components/screens/Admin/UserEditScreen.js';
 import MapScreen from './components/screens/MapScreen.js';
 import SellerRouteMain from './components/screens/Seller/SellerRouteMain.js';
+import SellerScreen from './components/screens/Seller/SellerScreen.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -311,6 +312,15 @@ function App() {
                 element={
                   <SellerRouteMain>
                     <ProductEditScreen />
+                  </SellerRouteMain>
+                }
+              />
+
+              <Route
+                path="/seller/:id"
+                element={
+                  <SellerRouteMain>
+                    <SellerScreen />
                   </SellerRouteMain>
                 }
               />

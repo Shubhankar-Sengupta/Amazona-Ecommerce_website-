@@ -48,6 +48,18 @@ function Product(props) {
           <strong>${product.price}</strong>
         </Card.Text>
 
+        {product.seller.seller && (
+          <Card.Text>
+            {userInfo && userInfo.isSeller ? (
+              <Link to={`/seller/${product.seller._id}`}>
+                {product.seller.seller.name}
+              </Link>
+            ) : (
+              `${product.seller.seller.name}`
+            )}
+          </Card.Text>
+        )}
+
         {product.countInStock === 0
           ? userInfo && (
               <Button variant="light" disabled>

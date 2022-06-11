@@ -104,7 +104,7 @@ function DashboardScreen() {
               <Card>
                 <Card.Body>
                   <Card.Title>
-                    {summary &&
+                    ${summary &&
                       summary.orders[0] &&
                       summary.orders[0].totalSales}
                   </Card.Title>
