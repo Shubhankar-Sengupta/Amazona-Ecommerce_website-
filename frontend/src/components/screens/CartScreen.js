@@ -23,20 +23,30 @@ function CartScreen() {
 
   const {
     cart: { cartItems },
+    error,
   } = state;
 
   const addToCartHandler = async (item, quantity) => {
     const { data } = await axios(`/api/products/${item._id}`);
+
+    console.log(cartItems);
 
     if (data.countInStock < quantity) {
       window.alert('Sorry. product is out of Stock');
       return;
     }
 
-    ctxDispatch({
-      type: 'Cart_Add_item',
-      payload: { ...item, quantity, seller: data.seller },
-    });
+    if (cartItems.length > 0 && data.seller._id !== cartItems[0].seller._id) {
+      ctxDispatch({
+        type: 'Cart_Add_Item_Fail',
+        payload: `Can't Add To Cart. Buy only from ${cartItems[0].seller.seller.name} in this order`,
+      });
+    } else {
+      ctxDispatch({
+        type: 'Cart_Add_item',
+        payload: { ...item, quantity, seller: data.seller },
+      });
+    }
   };
 
   const removeCartHandler = (item) => {
@@ -56,6 +66,7 @@ function CartScreen() {
         <title>Shopping Cart</title>
       </Helmet>
 
+      {error ? <Message variant="danger">{error}</Message> : ''}
       <h1>Shopping Cart</h1>
 
       <Row>

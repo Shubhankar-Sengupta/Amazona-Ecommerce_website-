@@ -79,6 +79,10 @@ function reducer(state, action) {
       };
     }
 
+    // if owner is not the same.
+    case 'Cart_Add_Item_Fail':
+      return { ...state, error: action.payload };
+
     // for authentication
     case 'User_SignedIn': {
       return { ...state, userInfo: action.payload };

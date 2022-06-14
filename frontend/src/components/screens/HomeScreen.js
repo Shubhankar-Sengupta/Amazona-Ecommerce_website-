@@ -58,7 +58,6 @@ function HomeScreen() {
 
     try {
       const { data } = await axios.get('/api/users/top-sellers');
-      console.log(data);
       cxtDispatch({ type: 'User_Topsellers_List_Success', payload: data });
     } catch (err) {
       cxtDispatch({

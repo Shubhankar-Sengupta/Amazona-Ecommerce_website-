@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Rating from './Rating';
 import { Store } from '../../Store';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 function Product(props) {
   const { product } = props;
@@ -29,7 +30,16 @@ function Product(props) {
       return;
     }
 
-    ctxDispatch({ type: 'Cart_Add_item', payload: { ...item, quantity } });
+    if (cartItems.length > 0 && data.seller._id !== cartItems[0].seller._id) {
+      ctxDispatch({
+        type: 'Cart_Add_Item_Fail',
+        payload: `Can't Add To Cart. Buy only from ${cartItems[0].seller.seller.name} in this order`,
+      });
+
+      toast.error('Can Purchase items only from one seller');
+    } else {
+      ctxDispatch({ type: 'Cart_Add_item', payload: { ...item, quantity } });
+    }
   };
 
   return (
