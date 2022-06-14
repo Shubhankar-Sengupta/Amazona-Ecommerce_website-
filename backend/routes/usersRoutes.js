@@ -24,6 +24,20 @@ userRouter.get(
   })
 );
 
+// routes for returning the top-sellers.
+userRouter.get(
+  '/top-sellers',
+  expressAsyncHandler(async (req, res) => {
+    const topSellers = await User.find({ isSeller: true })
+      .sort({
+        'seller.rating': -1, // rating should be descending
+      })
+      .limit(3);
+
+    res.send(topSellers);
+  })
+);
+
 // route for getting the user by /:id
 userRouter.get(
   '/:id',

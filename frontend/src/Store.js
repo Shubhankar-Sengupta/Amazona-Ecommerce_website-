@@ -3,7 +3,7 @@ import { useReducer, createContext } from 'react';
 import logger from 'use-reducer-logger';
 import axios from 'axios';
 
-// this gives us a Context Object.
+// this gives us a Context Object and store it inside the Store variable.
 export const Store = createContext();
 
 const initialState = {
@@ -26,6 +26,9 @@ const initialState = {
   },
 
   // special case for Order screen.
+  loadingSellers: false,
+  errorSellers: '',
+  users: [],
   loading: true,
   error: '',
   loadingPay: false,
@@ -76,6 +79,7 @@ function reducer(state, action) {
       };
     }
 
+    // for authentication
     case 'User_SignedIn': {
       return { ...state, userInfo: action.payload };
     }
@@ -94,6 +98,7 @@ function reducer(state, action) {
       };
     }
 
+    // for saving shipping address
     case 'shippingAddress': {
       return {
         ...state,
@@ -114,6 +119,7 @@ function reducer(state, action) {
       };
     }
 
+    // for saving payment method type
     case 'Save_Payment_method': {
       return {
         ...state,
@@ -121,6 +127,7 @@ function reducer(state, action) {
       };
     }
 
+    // to clear the cart
     case 'Cart_Clear': {
       return {
         ...state,
@@ -128,6 +135,7 @@ function reducer(state, action) {
       };
     }
 
+    // for orders
     case 'Fetch_Request_Order':
       return { ...state, loading: true, error: '' };
 
@@ -137,6 +145,7 @@ function reducer(state, action) {
     case 'Fetch_Fail_Order':
       return { ...state, loading: false, error: action.payload };
 
+    // for payment of orders
     case 'Pay_Request_Order':
       return { ...state, loadingPay: true };
 
@@ -160,12 +169,23 @@ function reducer(state, action) {
       return { ...state, successPay: false, loadingPay: false, error: '' };
     }
 
+    // for maps
     case 'Set_FullBox_On': {
       return { ...state, fullBox: true };
     }
     case 'Set_FullBox_Off': {
       return { ...state, fullBox: false };
     }
+
+    // for topSellers
+    case 'User_Topsellers_List_Request':
+      return { ...state, loadingSellers: true };
+
+    case 'User_Topsellers_List_Success':
+      return { ...state, loadingSellers: false, users: [...action.payload] };
+
+    case 'User_Topsellers_List_Fail':
+      return { ...state, loadingSellers: false, errorSellers: action.payload };
 
     default:
       return state;

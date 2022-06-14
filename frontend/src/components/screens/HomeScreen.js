@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer } from 'react';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
 import Product from '../main_components/Product';
@@ -8,6 +8,11 @@ import { Helmet } from 'react-helmet-async';
 import Loader from '../main_components/Loader';
 import Message from '../main_components/Message';
 import { getError } from '../main_components/utils.js';
+import { Link } from 'react-router-dom';
+import { Store } from '../../Store';
+import { toast } from 'react-toastify';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { Carousel } from 'react-responsive-carousel';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -35,6 +40,10 @@ function reducer(state, action) {
 }
 
 function HomeScreen() {
+  const { state, dispatch: cxtDispatch } = useContext(Store);
+
+  const { loadingSellers, users: sellers, errorSellers } = state;
+
   const [{ loading, error, products }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
     {
@@ -43,6 +52,23 @@ function HomeScreen() {
       error: '',
     }
   );
+
+  const topSellers = async () => {
+    cxtDispatch({ type: 'User_Topsellers_List_Request' });
+
+    try {
+      const { data } = await axios.get('/api/users/top-sellers');
+      console.log(data);
+      cxtDispatch({ type: 'User_Topsellers_List_Success', payload: data });
+    } catch (err) {
+      cxtDispatch({
+        type: 'User_Topsellers_List_Fail',
+        payload: getError(err),
+      });
+
+      toast.error(getError(err));
+    }
+  };
 
   // repilcating componentDidMount();
   useEffect(() => {
@@ -64,6 +90,8 @@ function HomeScreen() {
     };
     // here we call fetch data.
     fetchData();
+
+    topSellers();
   }, []);
 
   // we use JSX fragment.
@@ -73,6 +101,35 @@ function HomeScreen() {
       <Helmet>
         <title>Amazona</title>
       </Helmet>
+
+      {loadingSellers ? (
+        <Loader />
+      ) : errorSellers ? (
+        <Message variant="danger">{errorSellers}</Message>
+      ) : (
+        <>
+          {sellers.length === 0 && (
+            <Message variant="warning">No Seller Found</Message>
+          )}
+          <Carousel
+            showArrows
+            autoPlay
+            infiniteLoop
+            showThumbs={false}
+            interval={6000}
+            className="home-sceen-carousel"
+          >
+            {sellers.map((seller) => (
+              <div key={seller._id}>
+                <Link to={`/seller/${seller._id}`}>
+                  <img src={seller.seller.logo} alt={seller.name} />
+                  <p className="legend">{seller.name}</p>
+                </Link>
+              </div>
+            ))}
+          </Carousel>
+        </>
+      )}
 
       <h1>Featured products</h1>
       {loading ? (

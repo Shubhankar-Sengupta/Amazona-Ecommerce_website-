@@ -256,3 +256,8 @@ button:disabled {
 button.thumbnail {
   padding: 0;
 }
+
+/* Carousel */
+.carousel .slide img {
+  max-width: 30rem;
+}
