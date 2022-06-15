@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react';
+import React, { useContext, useEffect, useReducer, useRef } from 'react';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
 import Product from '../main_components/Product';
@@ -43,6 +43,8 @@ function HomeScreen() {
   const { state, dispatch: cxtDispatch } = useContext(Store);
 
   const { loadingSellers, users: sellers, errorSellers } = state;
+
+  const scrollRef = useRef(null);
 
   const [{ loading, error, products }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
@@ -100,6 +102,28 @@ function HomeScreen() {
       <Helmet>
         <title>Amazona</title>
       </Helmet>
+
+      <div
+        className="container-fluid main-homescreen-image mb-5"
+        style={{ padding: '0' }}
+      >
+        <img
+          className="image-home"
+          src="\images\ecommerce\HomeScreenImage.png"
+          style={{ height: '680px', padding: '0px' }}
+        />
+
+        <div
+          ref={scrollRef}
+          className="scroll-down"
+          onClick={() => {
+            window.scrollTo({
+              behavior: 'smooth',
+              top: scrollRef.current.offsetTop,
+            });
+          }}
+        ></div>
+      </div>
 
       {loadingSellers ? (
         <Loader />
