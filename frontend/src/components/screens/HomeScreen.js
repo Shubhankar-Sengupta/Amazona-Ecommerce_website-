@@ -1,9 +1,6 @@
 import React, { useContext, useEffect, useReducer, useRef } from 'react';
 import axios from 'axios';
 import logger from 'use-reducer-logger';
-import Product from '../main_components/Product';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import { Helmet } from 'react-helmet-async';
 import Loader from '../main_components/Loader';
 import Message from '../main_components/Message';
@@ -13,6 +10,7 @@ import { Store } from '../../Store';
 import { toast } from 'react-toastify';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
+import Paginated from '../main_components/Pagination/Paginated';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -122,7 +120,11 @@ function HomeScreen() {
               top: scrollRef.current.offsetTop,
             });
           }}
-        ></div>
+        >
+          <span className="tooltiptext badge badge-secondary">
+            Scroll Below
+          </span>
+        </div>
       </div>
 
       {loadingSellers ? (
@@ -160,13 +162,9 @@ function HomeScreen() {
       ) : error ? (
         <Message variant="danger">{error}</Message>
       ) : (
-        <Row>
-          {products.map((product) => (
-            <Col key={product.slug} sm={6} md={4} lg={3} className="mb-3">
-              <Product product={product} />
-            </Col>
-          ))}
-        </Row>
+        <>
+          <Paginated products={products} itemsPerPage={4} />
+        </>
       )}
     </>
   );

@@ -23,6 +23,7 @@ import Form from 'react-bootstrap/Form';
 import FloatingLabel from 'react-bootstrap/FloatingLabel';
 import { toast } from 'react-toastify';
 import Card from 'react-bootstrap/Card';
+import PaginatedReview from '../main_components/Pagination/PaginatedReview';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -302,14 +303,7 @@ function ProductScreen() {
             </div>
 
             <ListGroup>
-              {product.reviews.map((review) => (
-                <ListGroup.Item className="mb-3" key={review._id}>
-                  <strong>{review.name}</strong>
-                  <Rating rating={review.rating} caption=""></Rating>
-                  <p>{review.createdAt.substring(0, 10)}</p>
-                  <p>{review.comment}</p>
-                </ListGroup.Item>
-              ))}
+              <PaginatedReview product={product} itemsPerPage={1} />
             </ListGroup>
 
             <div className="mb-3">

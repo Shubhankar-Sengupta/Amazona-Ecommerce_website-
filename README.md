@@ -314,3 +314,5 @@
 
 
 59. Image for home screen display
+
+60. Implement React Paginate for homescreen and product page

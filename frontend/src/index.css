@@ -281,12 +281,7 @@ button.thumbnail {
   cursor: pointer;
   bottom: 20px;
   left: 50%;
-  transition: all 0.25s ease-in-out;
   background-color: rgba(240, 192, 64, 0.6);
-}
-
-.scroll-down:hover {
-  transform: scale(1.25);
 }
 
 .scroll-down::before,
@@ -307,6 +302,27 @@ button.thumbnail {
 .scroll-down::after {
   top: 20%;
   animation-delay: 0.3s;
+}
+
+.scroll-down .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  transform: scale(.75);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 7px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -25px;
+  left: 45%;
+}
+
+.scroll-down:hover .tooltiptext {
+  visibility: visible;
 }
 
 @keyframes scroll-down {
