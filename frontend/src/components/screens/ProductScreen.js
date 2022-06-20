@@ -303,7 +303,7 @@ function ProductScreen() {
             </div>
 
             <ListGroup>
-              <PaginatedReview product={product} itemsPerPage={1} />
+              <PaginatedReview product={product} itemsPerPage={2} />
             </ListGroup>
 
             <div className="mb-3">

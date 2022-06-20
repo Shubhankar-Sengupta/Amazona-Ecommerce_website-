@@ -9,6 +9,7 @@ import path from 'path';
 import stripeRouter from './routes/stripeRoutes.js';
 import ExpressMongoSanitize from 'express-mongo-sanitize';
 import uploadRouter from './routes/uploadRoutes.js';
+import http from 'http';
 
 // dotenv configuration. To Load Environment Variables from the process object and env object.
 dotenv.config();

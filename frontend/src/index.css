@@ -268,7 +268,7 @@ button.thumbnail {
 
 .image-home {
   object-fit: cover;
-  object-position: bottom;
+  object-position: center;
   width: inherit;
 }
 

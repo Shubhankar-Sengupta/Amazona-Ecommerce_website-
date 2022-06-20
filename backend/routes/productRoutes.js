@@ -106,6 +106,20 @@ productsRoutes.delete(
   })
 );
 
+productsRoutes.get(
+  '/top-sales-brand',
+  expressAsyncHandler(async (req, res) => {
+    //top brand names based on rating
+    const productByBrand = await Product.aggregate([
+      { $group: { _id: '$brand', avgrating: { $avg: { $sum: '$rating' } } } },
+    ])
+      .sort({ avgrating: -1 })
+      .limit(3);
+
+    res.send(productByBrand);
+  })
+);
+
 productsRoutes.post(
   '/',
   isAuth,

@@ -11,6 +11,9 @@ import { toast } from 'react-toastify';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 import Paginated from '../main_components/Pagination/Paginated';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import ListGroup from 'react-bootstrap/ListGroup';
 
 function reducer(state, action) {
   // second option that by default is passed to the reducer is action and the first is initial state.
@@ -25,6 +28,18 @@ function reducer(state, action) {
         ...state,
         loading: false,
         products: action.payload.products,
+      };
+    case 'Fetch_Request_Brand':
+      return {
+        ...state,
+        loadingBrand: false,
+      };
+
+    case 'Fetch_Success_Brand':
+      return {
+        ...state,
+        loadingBrand: false,
+        brand: action.payload,
       };
     case 'Fetch_Fail':
       return {
@@ -44,7 +59,7 @@ function HomeScreen() {
 
   const scrollRef = useRef(null);
 
-  const [{ loading, error, products }, dispatch] = useReducer(
+  const [{ loading, error, products, brand }, dispatch] = useReducer(
     process.env.NODE_ENV === 'development' ? logger(reducer) : reducer,
     {
       products: [],
@@ -91,7 +106,24 @@ function HomeScreen() {
     fetchData();
 
     topSellers();
-  }, []);
+
+    const fetchTopBrands = async () => {
+      dispatch({ type: 'Fetch_Request_Brand', loading: true });
+
+      try {
+        const { data } = await axios.get('/api/products/top-sales-brand');
+
+        dispatch({
+          type: 'Fetch_Success_Brand',
+          payload: data,
+        });
+      } catch (err) {
+        dispatch({ type: 'Fetch_Fail', payload: getError(err) });
+      }
+    };
+
+    fetchTopBrands();
+  }, [dispatch]);
 
   // we use JSX fragment.
 
@@ -157,6 +189,20 @@ function HomeScreen() {
       )}
 
       <h1>Featured products</h1>
+
+      <h5>Top Brands</h5>
+
+      <Row>
+        {brand &&
+          brand.map((item) => (
+            <Col>
+              <ListGroup variant="flush">
+                <ListGroup.Item key={item._id}>{item._id}</ListGroup.Item>
+              </ListGroup>
+            </Col>
+          ))}
+      </Row>
+
       {loading ? (
         <Loader />
       ) : error ? (
