@@ -195,9 +195,9 @@ function HomeScreen() {
       <Row>
         {brand &&
           brand.map((item) => (
-            <Col>
+            <Col key={item._id}>
               <ListGroup variant="flush">
-                <ListGroup.Item key={item._id}>{item._id}</ListGroup.Item>
+                <ListGroup.Item>{item._id}</ListGroup.Item>
               </ListGroup>
             </Col>
           ))}

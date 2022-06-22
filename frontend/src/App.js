@@ -37,6 +37,8 @@ import UserEditScreen from './components/screens/Admin/UserEditScreen.js';
 import MapScreen from './components/screens/MapScreen.js';
 import SellerRouteMain from './components/screens/Seller/SellerRouteMain.js';
 import SellerScreen from './components/screens/Seller/SellerScreen.js';
+import SupportScreen from './components/screens/Admin/SupportScreen.js';
+import ChatBox from './components/screens/ChatBox.js';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -184,6 +186,10 @@ function App() {
                       <LinkContainer to="/admin/users">
                         <NavDropdown.Item>Users</NavDropdown.Item>
                       </LinkContainer>
+
+                      <LinkContainer to="/admin/support">
+                        <NavDropdown.Item>Support</NavDropdown.Item>
+                      </LinkContainer>
                     </NavDropdown>
                   )}
                 </Nav>
@@ -288,6 +294,14 @@ function App() {
                   </AdminRouteMain>
                 }
               />
+              <Route
+                path="/admin/support"
+                element={
+                  <AdminRouteMain>
+                    <SupportScreen />
+                  </AdminRouteMain>
+                }
+              />
 
               {/*Seller Route main*/}
               <Route
@@ -329,6 +343,9 @@ function App() {
         </main>
 
         <footer>
+          {userInfo && !userInfo.isAdmin && (
+            <ChatBox userInfo={userInfo}/>
+          )}
           <div className="text-center">All rights Reserved</div>
         </footer>
       </div>

@@ -318,3 +318,8 @@
 60. Implement React Paginate for homescreen and product page
 
 61. Little change to the code (Displaying top brands)
+
+62. Implement Live Chat With Customers
+     1.  use socket io to create backend
+     2.  create chat box component
+     3.  create support screen
